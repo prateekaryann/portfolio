@@ -1,101 +1,69 @@
-# Prateek Aryan — Portfolio
+# prateekaryann portfolio
 
-A modern, minimal personal portfolio built with **React + Vite + TypeScript**, styled with **Tailwind CSS**, and animated with **Framer Motion**.
+Personal portfolio site for [Prateek Aryan](https://github.com/prateekaryann) — Senior Backend Engineer.
+
+Built with [Astro](https://astro.build) as a static site. Deployed to GitHub Pages at [prateekaryann.github.io/portfolio](https://prateekaryann.github.io/portfolio).
 
 ## Stack
 
-- [React 18](https://react.dev/) + [Vite 5](https://vitejs.dev/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS v3](https://tailwindcss.com/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [Lucide React](https://lucide.dev/) — icons
-- [gh-pages](https://github.com/tschaub/gh-pages) — GitHub Pages deploy
+- **Astro 5** — static site generator with first-class content collections
+- **TypeScript** — strict mode
+- **Pure CSS** — no framework, one ~300-line global stylesheet
+- **Markdown** — case studies authored as Markdown in `src/content/case-studies/`
+- **Inter + JetBrains Mono** — via Google Fonts
 
-## Project structure
+## Structure
 
 ```
 src/
-├── components/       # One file per section
-│   ├── Header.tsx
-│   ├── Hero.tsx
-│   ├── About.tsx
-│   ├── Skills.tsx
-│   ├── Projects.tsx
-│   ├── Experience.tsx
-│   └── Contact.tsx
-├── data/
-│   └── portfolio.ts  # All personal data — edit this file
-├── hooks/
-│   └── useTheme.ts   # Dark/light mode toggle
-├── App.tsx
-├── main.tsx
-└── index.css
+  content/case-studies/   Markdown case studies (content collection)
+  content.config.ts       Content collection schema
+  layouts/Base.astro      Shared HTML shell with OG tags, header, footer
+  pages/
+    index.astro           Hero, about, case study list, projects, contact
+    case-studies/[...slug].astro   Per-case-study page
+  styles/global.css       Single stylesheet, variables + resets + components
+public/
+  favicon.svg
+astro.config.mjs          base='/portfolio', sitemap integration
 ```
 
-## Getting started
+## Commands
 
 ```bash
-# Install dependencies
-npm install
-
-# Start dev server (http://localhost:5173)
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build locally
-npm run preview
+npm install         # install dependencies
+npm run dev         # local dev server
+npm run build       # build to dist/
+npm run preview     # preview the built site locally
 ```
 
-## Customise your content
+## Deployment
 
-All personal data lives in **`src/data/portfolio.ts`**. Update the following exports:
+Pushes to `main` trigger `.github/workflows/deploy.yml`, which builds the site and deploys to GitHub Pages via the official GitHub Actions.
 
-| Export | What to change |
-|--------|---------------|
-| `personal` | Name, role, email, GitHub, LinkedIn |
-| `bio` | Your About section text |
-| `skillGroups` | Skills grouped by category |
-| `projects` | Project cards (title, description, tags, links) |
-| `experience` | Timeline entries (role, company, dates, bullet points) |
+Repository Pages settings required (one-time):
+- Settings → Pages → Source: **GitHub Actions**
 
-## Deploy to GitHub Pages
+## Adding a case study
 
-### Manual deploy
+1. Create `src/content/case-studies/NN-slug.md`
+2. Add frontmatter matching the schema in `src/content.config.ts`:
+   ```yaml
+   ---
+   title: "Title"
+   description: "Short description for link previews"
+   publishedAt: "YYYY-MM-DD"
+   stack: ["tag1", "tag2"]
+   order: N
+   featured: true
+   ---
+   ```
+3. Write Markdown body
+4. Commit and push — GitHub Action builds and deploys
 
-```bash
-npm run deploy
-```
+## Ethical floor
 
-This runs `npm run build` then pushes the `dist/` folder to the `gh-pages` branch.
-
-### Automatic deploy (GitHub Actions)
-
-Push to `main` → the workflow at `.github/workflows/deploy.yml` builds and deploys automatically.
-
-**Setup steps:**
-
-1. Go to **Settings → Pages** in your GitHub repo
-2. Set source to **`gh-pages` branch**
-3. (Optional) Add your custom domain in **Settings → Pages → Custom domain**
-4. Update `public/CNAME` with your domain (or delete it if you're not using one)
-5. Update the `cname` field in `.github/workflows/deploy.yml`
-
-### Custom domain (optional)
-
-Replace the content of `public/CNAME` with your domain:
-
-```
-yourdomain.com
-```
-
-If you're not using a custom domain, delete `public/CNAME` and remove the `cname:` line from the deploy workflow.
-
-## Dark / light mode
-
-The site defaults to dark mode (or respects the user's OS preference). The toggle in the header persists the choice to `localStorage`.
-
-## License
-
-MIT — feel free to fork and adapt.
+All case studies follow these rules:
+- Real work only. Every story happened. Numbers are real.
+- Sanitized — company-specific details (customers, schemas, product names, internal tool names) are generalized.
+- Honest retro — every case study ends with "what I would do differently".

@@ -1,0 +1,139 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const caseStudies = (await getCollection('case-studies'))
+  .filter((entry) => entry.data.featured)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const pageTitle = 'Prateek Aryan — Senior Backend Engineer';
+const pageDescription =
+  'Senior Backend Engineer building distributed systems and platform automation on Python, FastAPI, and AWS. Case studies and open-source projects.';
+---
+
+<Base title={pageTitle} description={pageDescription}>
+  <section class="hero">
+    <h1>Prateek Aryan</h1>
+    <p class="tagline">
+      Senior Backend Engineer building distributed systems and platform automation on
+      <strong>Python</strong>, <strong>FastAPI</strong>, and <strong>AWS</strong>.
+      Based in Bengaluru · Comfortable across US and EU overlap.
+    </p>
+
+    <div class="chips">
+      <span class="chip">Python</span>
+      <span class="chip">FastAPI</span>
+      <span class="chip">AWS</span>
+      <span class="chip">Distributed Systems</span>
+      <span class="chip">Platform Reliability</span>
+      <span class="chip">LLM Infrastructure</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>About</h2>
+    <p>
+      I build backend systems that stay up when things get hard.
+    </p>
+    <p>
+      Currently Senior Software Engineer II at
+      <a href="https://usefulbi.com">UsefulBI</a>, where I architected the backend for an
+      AI-powered clinical document platform on FastAPI + PostgreSQL — designed for
+      <strong>FDA 21 CFR Part 11 compliance</strong> from day one, with audit trails,
+      section-level versioning, and RBAC across 12+ modules.
+    </p>
+    <p>
+      Most recent measurable win: I cut a clinical document retrieval API from
+      <strong>7–8 seconds to under 50ms — a 99.3% reduction</strong> — by replacing
+      synchronous S3 polling with a database registry and turning O(n) prefix scans into
+      O(1) indexed queries. Full write-up
+      <a href={import.meta.env.BASE_URL + '/case-studies/01-cutting-document-retrieval-from-7s-to-50ms/'}>here</a>.
+    </p>
+    <p>
+      Before UsefulBI, I spent five years at
+      <strong>Cisco Systems</strong> building the platform automation that kept
+      <strong>200+ enterprise applications</strong> reliable: MySQL upgrades, Postgres
+      provisioning, Oracle switchover, production-to-non-prod refresh workflows, MongoDB
+      cluster operations, and a resilient switchover system using gRPC across
+      primary/standby clusters. Along the way I cut SOX compliance reporting from 3+ hours
+      to under 10 minutes and reduced manual DBA workload by 80%.
+    </p>
+    <p>
+      Recently I've been going deeper on LLM orchestration — designing automated report
+      generation pipelines with AWS Step Functions and Bedrock, with Lambda handling each
+      stage (ingestion, section-wise generation, validation, assembly) and domain SMEs
+      collaborating on regulatory requirements.
+    </p>
+    <p class="muted small">
+      <strong>Certified:</strong> MongoDB DBA · AWS Certified Cloud Practitioner · HashiCorp
+      Terraform Associate · PCAP — Python Programming.
+    </p>
+    <p class="muted small">
+      <strong>Education:</strong> B.E. Computer Science, BMS College of Engineering (9.2 GPA).
+    </p>
+  </section>
+
+  <section id="case-studies">
+    <h2>Case studies</h2>
+    {
+      caseStudies.map((entry) => (
+        <a
+          class="case-study-card"
+          href={`${import.meta.env.BASE_URL}/case-studies/${entry.id}/`}
+        >
+          <h3>{entry.data.title}</h3>
+          <p>{entry.data.description}</p>
+          <span class="meta">{entry.data.stack.join(' · ')}</span>
+        </a>
+      ))
+    }
+  </section>
+
+  <section id="projects">
+    <h2>Open-source projects</h2>
+    <ul class="project-list">
+      <li>
+        <span class="name">
+          <a href="https://github.com/prateekaryann/documind">documind</a>
+        </span>
+        <span class="desc">Production-grade RAG Q&A API — FastAPI + pgvector + Celery + SSE</span>
+      </li>
+      <li>
+        <span class="name">
+          <a href="https://github.com/prateekaryann/deep-focus-studio">deep-focus-studio</a>
+        </span>
+        <span class="desc">Neuroscience-backed ambient sound & focus timer (live)</span>
+      </li>
+      <li>
+        <span class="name">
+          <a href="https://github.com/prateekaryann/dj-visualizer">dj-visualizer</a>
+        </span>
+        <span class="desc">Real-time mic-reactive 3D WebGL visualizer</span>
+      </li>
+      <li>
+        <span class="name">
+          <a href="https://github.com/prateekaryann/mcp-servers">mcp-servers</a>
+        </span>
+        <span class="desc">Collection of MCP servers with shared transport and OAuth</span>
+      </li>
+      <li>
+        <span class="name">
+          <a href="https://github.com/prateekaryann/github-mcp">github-mcp</a>
+        </span>
+        <span class="desc">MCP server wrapping GitHub CLI for Claude integration</span>
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Contact</h2>
+    <p>
+      <a href="mailto:prateekaryyan@gmail.com">prateekaryyan@gmail.com</a> ·
+      <a href="https://github.com/prateekaryann">github.com/prateekaryann</a> ·
+      <a href="https://linkedin.com/in/prateek-aryan">linkedin.com/in/prateek-aryan</a>
+    </p>
+    <p class="muted small">
+      Focus areas: distributed systems, platform reliability, LLM infrastructure, GenAI backends.
+    </p>
+  </section>
+</Base>
