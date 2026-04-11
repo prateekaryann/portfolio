@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0f13"/>
+      <stop offset="100%" stop-color="#17171d"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7aa2f7"/>
+      <stop offset="100%" stop-color="#e0af68"/>
+    </linearGradient>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#2a2a32" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.5"/>
+
+  <!-- Subtle border -->
+  <rect x="20" y="20" width="1160" height="590" fill="none" stroke="#2a2a32" stroke-width="1" rx="12"/>
+
+  <!-- Top mono tag -->
+  <text x="80" y="110" font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="22" fill="#6b6b74" letter-spacing="2">
+    $ whoami
+  </text>
+
+  <!-- Name -->
+  <text x="80" y="220" font-family="Inter, system-ui, sans-serif" font-size="88" font-weight="700" fill="#e8e8ea" letter-spacing="-2">
+    Prateek Aryan
+  </text>
+
+  <!-- Accent bar -->
+  <rect x="80" y="250" width="120" height="4" fill="url(#accent)"/>
+
+  <!-- Tagline line 1 -->
+  <text x="80" y="340" font-family="Inter, system-ui, sans-serif" font-size="40" font-weight="500" fill="#9b9ba4">
+    Senior Backend Engineer
+  </text>
+
+  <!-- Tagline line 2 -->
+  <text x="80" y="395" font-family="Inter, system-ui, sans-serif" font-size="32" font-weight="400" fill="#6b6b74">
+    Distributed Systems · Python · FastAPI · AWS
+  </text>
+
+  <!-- Chips -->
+  <g font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="20" fill="#9b9ba4">
+    <rect x="80" y="460" width="120" height="42" rx="21" fill="none" stroke="#2a2a32" stroke-width="1"/>
+    <text x="140" y="487" text-anchor="middle">Python</text>
+
+    <rect x="215" y="460" width="130" height="42" rx="21" fill="none" stroke="#2a2a32" stroke-width="1"/>
+    <text x="280" y="487" text-anchor="middle">FastAPI</text>
+
+    <rect x="360" y="460" width="90" height="42" rx="21" fill="none" stroke="#2a2a32" stroke-width="1"/>
+    <text x="405" y="487" text-anchor="middle">AWS</text>
+
+    <rect x="465" y="460" width="225" height="42" rx="21" fill="none" stroke="#2a2a32" stroke-width="1"/>
+    <text x="577" y="487" text-anchor="middle">Distributed Systems</text>
+
+    <rect x="705" y="460" width="230" height="42" rx="21" fill="none" stroke="#2a2a32" stroke-width="1"/>
+    <text x="820" y="487" text-anchor="middle">LLM Infrastructure</text>
+  </g>
+
+  <!-- Bottom URL -->
+  <text x="80" y="580" font-family="ui-monospace, SF Mono, Menlo, monospace" font-size="22" fill="#6b6b74" letter-spacing="1">
+    prateekaryann.github.io/portfolio
+  </text>
+
+  <!-- Bottom right ex-Cisco -->
+  <text x="1120" y="580" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="500" fill="#7aa2f7" text-anchor="end">
+    Ex-Cisco · @UsefulBI
+  </text>
+</svg>
