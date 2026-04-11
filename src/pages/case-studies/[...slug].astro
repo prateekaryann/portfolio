@@ -1,0 +1,42 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('case-studies');
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'case-studies'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, stack } = entry.data;
+---
+
+<Base title={`${title} — Prateek Aryan`} description={description}>
+  <article>
+    <p class="muted small">
+      <a href={import.meta.env.BASE_URL + '/'}>← back to portfolio</a>
+    </p>
+    <div class="chips" style="margin-bottom: 1.5rem;">
+      {stack.map((item) => <span class="chip">{item}</span>)}
+    </div>
+    <Content />
+  </article>
+
+  <section>
+    <h2>Contact</h2>
+    <p>
+      <a href="mailto:prateekaryyan@gmail.com">prateekaryyan@gmail.com</a> ·
+      <a href="https://github.com/prateekaryann">github.com/prateekaryann</a> ·
+      <a href="https://linkedin.com/in/prateek-aryan">linkedin.com/in/prateek-aryan</a>
+    </p>
+  </section>
+</Base>
