@@ -458,6 +458,6 @@ section.block { padding-block: clamp(3.5rem, 8vw, 6.5rem); position: relative; }
 
 .cs-figure { margin: 2.2rem 0; }
 .cs-figure .canvas { background: radial-gradient(circle at 25% 0%, rgba(139,92,246,.10), transparent 55%), var(--bg-1); border: 1px solid var(--glass-brd); border-radius: var(--r-lg); padding: 1.4rem 1rem; overflow-x: auto; }
-.cs-figure svg, .cs-figure img { width: 100%; min-width: 680px; height: auto; display: block; border: 0; margin: 0; border-radius: 0; }
+.cs-figure svg, .cs-figure img { width: 100%; height: auto; display: block; border: 0; margin: 0; border-radius: 0; }
 .cs-figure figcaption { margin-top: .85rem; font-size: .82rem; color: var(--fg-subtle); text-align: center; font-family: var(--font-mono); }
 .cs-figure .canvas text { font-family: var(--font-sans); }
