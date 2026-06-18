@@ -1,8 +1,8 @@
 export const SITE = {
   title: 'Prateek Aryan',
-  tagline: 'Senior Backend Engineer — Distributed Systems, Python, AWS',
+  tagline: 'Senior Software Engineer — LLM/GenAI Platforms · Distributed Systems · Python · AWS',
   description:
-    'Senior Backend Engineer building distributed systems and platform reliability on Python, FastAPI, and AWS. 5+ years at Cisco and UsefulBI.',
+    'Senior Software Engineer building production LLM/GenAI systems and distributed backends on Python, FastAPI, and AWS. Currently an AI Engineer on the Gilead Sciences clinical content-generation platform; 5+ years across Cisco and UsefulBI.',
   author: 'Prateek Aryan',
   email: 'prateekaryyan@gmail.com',
   url: 'https://prateekaryann.github.io/portfolio',

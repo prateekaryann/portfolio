@@ -6,48 +6,58 @@ const caseStudies = (await getCollection('case-studies'))
   .filter((entry) => entry.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
 
-const pageTitle = 'Prateek Aryan — Senior Backend Engineer';
+const pageTitle = 'Prateek Aryan — Senior Software Engineer · LLM/GenAI & Distributed Systems';
 const pageDescription =
-  'Senior Backend Engineer building distributed systems and platform automation on Python, FastAPI, and AWS. Case studies and open-source projects.';
+  'Senior Software Engineer building production LLM/GenAI systems and distributed backends on Python, FastAPI, and AWS. AI Engineer on the Gilead Sciences clinical content-generation platform. Case studies and open-source projects.';
 ---
 
 <Base title={pageTitle} description={pageDescription}>
   <section class="hero">
     <h1>Prateek Aryan</h1>
     <p class="tagline">
-      Senior Backend Engineer building distributed systems and platform automation on
-      <strong>Python</strong>, <strong>FastAPI</strong>, and <strong>AWS</strong>.
-      Based in Bengaluru · Comfortable across US and EU overlap.
+      Senior Software Engineer building production <strong>LLM/GenAI systems</strong> and
+      distributed backends on <strong>Python</strong>, <strong>FastAPI</strong>, and
+      <strong>AWS</strong>. Based in Bengaluru · Comfortable across US and EU overlap.
     </p>
 
     <div class="chips">
       <span class="chip">Python</span>
       <span class="chip">FastAPI</span>
       <span class="chip">AWS</span>
+      <span class="chip">RAG Pipelines</span>
+      <span class="chip">LLM Orchestration</span>
       <span class="chip">Distributed Systems</span>
       <span class="chip">Platform Reliability</span>
-      <span class="chip">LLM Infrastructure</span>
     </div>
   </section>
 
   <section>
     <h2>About</h2>
     <p>
-      I build backend systems that stay up when things get hard.
+      I build backend and LLM systems that stay up when things get hard.
     </p>
     <p>
-      Currently Senior Software Engineer II at
-      <a href="https://usefulbi.com">UsefulBI</a>, where I architected the backend for an
-      AI-powered clinical document platform on FastAPI + PostgreSQL — designed for
-      <strong>FDA 21 CFR Part 11 compliance</strong> from day one, with audit trails,
-      section-level versioning, and RBAC across 12+ modules.
+      Right now I'm an <strong>AI Engineer on the Gilead Sciences</strong> clinical
+      content-generation platform (via <a href="https://usefulbi.com">UsefulBI</a>),
+      building the production systems behind automated CSR, DSUR, and PLPS generation:
+      fault-tolerant LLM orchestration with durable execution, an idempotent RAG pipeline,
+      prompt-caching and model-tiering cost controls (~85% lower latency, ~90% lower token
+      cost on high-volume instructions), and the observability that keeps generation
+      quality measurable in production. Full write-up
+      <a href={import.meta.env.BASE_URL + '/case-studies/06-fault-tolerant-llm-content-generation-platform/'}>here</a>.
     </p>
     <p>
-      Most recent measurable win: I cut a clinical document retrieval API from
+      That engagement grew out of a platform I <strong>built and solely owned</strong> at
+      UsefulBI — an AI clinical-document POC on FastAPI + PostgreSQL with a 5-stage RAG
+      pipeline and <strong>21 CFR Part 11</strong> audit trails, section-level versioning,
+      and RBAC. It became the demo that won the Gilead engagement. My most measurable win
+      there: cutting a clinical document retrieval API from
       <strong>7–8 seconds to under 50ms — a 99.3% reduction</strong> — by replacing
       synchronous S3 polling with a database registry and turning O(n) prefix scans into
-      O(1) indexed queries. Full write-up
-      <a href={import.meta.env.BASE_URL + '/case-studies/01-cutting-document-retrieval-from-7s-to-50ms/'}>here</a>.
+      O(1) indexed queries
+      (<a href={import.meta.env.BASE_URL + '/case-studies/01-cutting-document-retrieval-from-7s-to-50ms/'}>write-up</a>),
+      and orchestrating the generation pipeline on AWS Step Functions + Bedrock
+      (<a href={import.meta.env.BASE_URL + '/case-studies/02-llm-orchestration-with-step-functions-and-bedrock/'}>write-up</a>).
     </p>
     <p>
       Before UsefulBI, I spent five years at
@@ -57,12 +67,6 @@ const pageDescription =
       cluster operations, and a resilient switchover system using gRPC across
       primary/standby clusters. Along the way I cut SOX compliance reporting from 3+ hours
       to under 10 minutes and reduced manual DBA workload by 80%.
-    </p>
-    <p>
-      Recently I've been going deeper on LLM orchestration — designing automated report
-      generation pipelines with AWS Step Functions and Bedrock, with Lambda handling each
-      stage (ingestion, section-wise generation, validation, assembly) and domain SMEs
-      collaborating on regulatory requirements.
     </p>
     <p class="muted small">
       <strong>Certified:</strong> MongoDB DBA · AWS Certified Cloud Practitioner · HashiCorp
@@ -133,7 +137,7 @@ const pageDescription =
       <a href="https://linkedin.com/in/prateek-aryan">linkedin.com/in/prateek-aryan</a>
     </p>
     <p class="muted small">
-      Focus areas: distributed systems, platform reliability, LLM infrastructure, GenAI backends.
+      Focus areas: LLM/GenAI platforms, RAG systems, distributed systems, platform reliability.
     </p>
   </section>
 </Base>
