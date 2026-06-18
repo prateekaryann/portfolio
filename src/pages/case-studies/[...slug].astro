@@ -19,7 +19,7 @@ interface Props {
 
 const { entry, prev, next } = Astro.props;
 const { Content, headings } = await render(entry);
-const { title, subtitle, description, stack, publishedAt, accent, order } = entry.data;
+const { title, subtitle, description, stack, publishedAt, accent, metric, metricLabel } = entry.data;
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const toc = headings.filter((h) => h.depth === 2);
@@ -31,19 +31,6 @@ const ACCENTS: Record<string, [string, string]> = {
   amber: ['#f5b14c', '#ec4899'], teal: ['#2dd4bf', '#22d3ee'], pink: ['#ec4899', '#a78bfa'],
 };
 const [a, b] = ACCENTS[accent] ?? ACCENTS.violet;
-const banner = `<svg viewBox="0 0 1200 320" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <defs>
-    <linearGradient id="bn" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>
-    <radialGradient id="bnr" cx="0.8" cy="0.2" r="0.7"><stop offset="0" stop-color="#fff" stop-opacity="0.4"/><stop offset="0.7" stop-color="#fff" stop-opacity="0"/></radialGradient>
-  </defs>
-  <rect width="1200" height="320" fill="url(#bn)"/><rect width="1200" height="320" fill="url(#bnr)"/>
-  <g fill="none" stroke="#fff" stroke-opacity="0.2" stroke-width="1.5">
-    <circle cx="980" cy="110" r="60"/><circle cx="980" cy="110" r="110"/><circle cx="980" cy="110" r="165"/>
-    <path d="M80 250 L260 180 L440 230 L620 150 L820 210 L1050 130"/>
-  </g>
-  <g fill="#fff" fill-opacity="0.85"><circle cx="80" cy="250" r="6"/><circle cx="260" cy="180" r="6"/><circle cx="440" cy="230" r="6"/><circle cx="620" cy="150" r="6"/><circle cx="820" cy="210" r="6"/></g>
-  <text x="70" y="130" font-family="'Space Grotesk',sans-serif" font-size="150" font-weight="700" fill="#fff" fill-opacity="0.85">0${order}</text>
-</svg>`;
 ---
 
 <Base title={`${title} — Prateek Aryan`} description={description}>
@@ -59,7 +46,12 @@ const banner = `<svg viewBox="0 0 1200 320" preserveAspectRatio="xMidYMid slice"
       <span><b>{dateStr}</b></span><span><b>{readMins} min</b> read</span><span><b>{stack[0]}</b></span>
     </div>
     <div class="chips" data-reveal data-delay="2">{stack.map((s) => <span class="chip">{s}</span>)}</div>
-    <div class="cs-banner" data-reveal data-delay="2" set:html={banner} />
+    {metric && (
+      <div class="cs-outcome" data-reveal data-delay="2" style={`--ac:${a};--ac2:${b}`}>
+        <span class="m">{metric}</span>
+        {metricLabel && <span class="l">{metricLabel}</span>}
+      </div>
+    )}
   </header>
 
   <div class="wrap narrow cs-layout">

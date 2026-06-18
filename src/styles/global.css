@@ -363,8 +363,9 @@ section.block { padding-block: clamp(3.5rem, 8vw, 6.5rem); position: relative; }
 .cs-masthead .sub { font-size: clamp(1.05rem, 2vw, 1.25rem); color: var(--fg-muted); max-width: 60ch; margin-bottom: 1.5rem; }
 .cs-masthead .masthead-meta { display: flex; flex-wrap: wrap; gap: 1.5rem; color: var(--fg-subtle); font-family: var(--font-mono); font-size: .8rem; margin-bottom: 1.5rem; }
 .cs-masthead .masthead-meta b { color: var(--fg); font-weight: 600; }
-.cs-banner { width: 100%; border-radius: var(--r-lg); overflow: hidden; border: 1px solid var(--glass-brd); margin-bottom: 1rem; }
-.cs-banner svg { width: 100%; height: auto; display: block; }
+.cs-outcome { display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: .3rem 1rem; margin-top: 1.8rem; padding: 1.1rem 1.6rem; border-radius: var(--r-lg); border: 1px solid var(--glass-brd); border-left: 4px solid var(--ac, var(--violet)); background: linear-gradient(120deg, color-mix(in srgb, var(--ac, var(--violet)) 18%, transparent), transparent 72%), var(--glass); }
+.cs-outcome .m { font-family: var(--font-display); font-weight: 700; font-size: clamp(1.7rem, 4vw, 2.5rem); line-height: 1; background: linear-gradient(120deg, var(--ac, var(--violet)), var(--ac2, var(--cyan))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.cs-outcome .l { color: var(--fg-muted); font-size: .95rem; }
 
 .cs-layout { display: grid; grid-template-columns: 1fr; gap: 3rem; }
 @media (min-width: 1040px) { .cs-layout { grid-template-columns: minmax(0,1fr) 230px; } }

@@ -7,6 +7,8 @@ stack: ["Python", "FastAPI", "PostgreSQL", "RAG", "Prompt Caching", "Anthropic C
 order: 0
 featured: true
 accent: "violet"
+metric: "~85% / ~90%"
+metricLabel: "inference latency / token cost cut"
 ---
 
 # A fault-tolerant, cost-optimized LLM platform for clinical document generation

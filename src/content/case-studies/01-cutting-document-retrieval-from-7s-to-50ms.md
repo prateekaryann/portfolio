@@ -7,6 +7,8 @@ stack: ["FastAPI", "PostgreSQL", "AWS S3", "SQLAlchemy", "Alembic"]
 order: 1
 featured: true
 accent: "cyan"
+metric: "7–8s → <50ms"
+metricLabel: "99.3% latency reduction"
 ---
 
 # Cutting a clinical document retrieval API from 7s to 50ms

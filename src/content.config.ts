@@ -12,6 +12,8 @@ const caseStudies = defineCollection({
     order: z.number().default(99),
     featured: z.boolean().default(true),
     accent: z.enum(['violet', 'cyan', 'indigo', 'amber', 'teal', 'pink']).default('violet'),
+    metric: z.string().optional(),
+    metricLabel: z.string().optional(),
   }),
 });
 

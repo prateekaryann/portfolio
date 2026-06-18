@@ -7,6 +7,8 @@ stack: ["Python", "PostgreSQL", "pandas", "Jenkins", "Ansible"]
 order: 4
 featured: true
 accent: "teal"
+metric: "3h → 10min"
+metricLabel: "SOX reporting, automated"
 ---
 
 # Accelerating SOX compliance reporting from 3+ hours to under 10 minutes
