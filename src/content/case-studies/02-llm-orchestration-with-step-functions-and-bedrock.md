@@ -45,46 +45,10 @@ Before writing any code, I wrote down what a good orchestration layer had to do:
 
 ## The architecture at a glance
 
-```
-  ┌──────────────────────────────────────────────────────────────┐
-  │                     State machine: GenerateReport            │
-  └──────────────────────────────────────────────────────────────┘
-
-  [Start]
-     │
-     ▼
-  [Ingest]              Lambda: pull source docs from S3,
-     │                  run through parser, upload normalized JSON.
-     │
-     ▼
-  [Plan sections]       Lambda: decide which sections this report type needs,
-     │                  return list of section tasks.
-     │
-     ▼
-  [Map over sections]   Step Functions Map state, parallelism=N:
-     │                    │
-     │                    ├─ [Generate section] Lambda → Bedrock
-     │                    │       │
-     │                    │       ▼
-     │                    ├─ [Validate section] Lambda → schema + rules
-     │                    │       │
-     │                    │       ▼ on failure
-     │                    └─ [Retry with repair prompt] Lambda → Bedrock
-     │
-     ▼
-  [Human review gate]   Step Functions Wait state + callback token
-     │                  (resumes when regulatory reviewer signs off)
-     │
-     ▼
-  [Assemble]            Lambda: merge approved sections into a final document
-     │                  (DOCX / PDF), push to storage, update registry.
-     │
-     ▼
-  [Notify]              Lambda: emit events to the platform's notification bus
-     │
-     ▼
-  [End]
-```
+<figure class="cs-figure">
+<div class="canvas"><img src="/portfolio/diagrams/arch02.svg" alt="AWS Step Functions state machine: Ingest, Plan, parallel Map (generate/validate with repair), Human gate via callback token, Assemble, Notify. Bedrock for model calls, S3 for documents." loading="lazy" /></div>
+<figcaption>Each box is a Lambda; Step Functions owns state, transitions, retries, parallelism, and the human-review pause.</figcaption>
+</figure>
 
 Each box is a Lambda. The orchestration — state, transitions, retries, parallelism, the human-review pause — is entirely handled by Step Functions.
 
@@ -142,7 +106,7 @@ The validate stage is a Lambda that runs the model's output through:
 
 If validation fails, the state machine transitions to **Retry with repair prompt**: a second Lambda that builds a "you made these specific mistakes, try again" prompt and calls Bedrock one more time with the original context plus the validator's error list.
 
-**Pattern worth calling out:** never retry an LLM with the exact same prompt on failure. The model will almost certainly produce the same kind of error. Retry with the error list in the prompt so the model has new information to act on.
+<div class="cs-callout tip"><span class="ic"></span><div class="bd"><strong>Pattern worth stealing</strong><p>Never retry an LLM with the exact same prompt on failure — it will almost certainly reproduce the same error. Retry with the validator's error list in the prompt, so the model has new information to act on.</p></div></div>
 
 ### Stage: Human review gate
 
@@ -190,6 +154,8 @@ Honest retrospective notes:
 3. **Retries with jitter are free.** Do not write custom retry loops inside your Lambdas. Let the orchestrator handle it via its retry policy.
 4. **The denylist safety check earns its keep from day one.** Even on a regulated workflow where the inputs are highly structured, the one-in-ten-thousand case where the model does something unexpected is the one you care about most.
 5. **A schema validator is the cheapest, highest-ROI thing you can add to an LLM pipeline.** It turns "the model is being weird" from an unknown-unknown into a known-unknown with a clean retry path.
+
+<div class="cs-pullquote">Your LLM pipeline is a distributed system — and everything distributed systems have taught us over the last twenty years still applies.</div>
 
 ## What transfers to other systems
 

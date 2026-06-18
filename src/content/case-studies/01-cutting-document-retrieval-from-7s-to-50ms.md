@@ -23,6 +23,13 @@ A clinical document retrieval API was taking 7–8 seconds per request in produc
 
 This is the story of how I got there.
 
+<div class="cs-statrow">
+  <div class="s"><div class="v">99.3%</div><div class="l">latency reduction</div></div>
+  <div class="s"><div class="v">58ms</div><div class="l">p95 (was 7.8s)</div></div>
+  <div class="s"><div class="v">0</div><div class="l">S3 list calls / request</div></div>
+  <div class="s"><div class="v">1</div><div class="l">sprint to ship</div></div>
+</div>
+
 ## Context: what the API does
 
 In the platform, each clinical study produces documents that pass through a multi-stage review workflow — CSR sections, DSUR updates, PLPS revisions, and so on. Every version of every section is stored in S3 behind a structured prefix hierarchy that encodes study ID, document type, section ID, and version. The retrieval API is the read-side of this: given a logical document identifier, return the latest approved version, plus its metadata, plus a presigned URL for the client to download.
@@ -108,6 +115,11 @@ That question has nothing to do with object storage. It is relational metadata. 
 
 The actual fix was to introduce a small table — I'll call it `document_registry` — that mirrored the answer to that question directly.
 
+<figure class="cs-figure">
+<div class="canvas"><img src="/portfolio/diagrams/arch01.svg" alt="Before: the API runs a paginated O(n) S3 list (7-8s). After: an O(1) indexed Postgres registry lookup plus a presigned URL to S3 (under 50ms)." loading="lazy" /></div>
+<figcaption>The fix in one picture: move "what is the latest approved version?" out of S3 listing and into an indexed Postgres lookup.</figcaption>
+</figure>
+
 ```python
 class DocumentRegistry(Base):
     __tablename__ = "document_registry"
@@ -185,6 +197,8 @@ async def approve_document_version(
 
 `_sync_registry` is an upsert keyed on `logical_document_id` that updates the registry row to point at the latest approved version if this newly-approved version is actually the newest. Critically, **the upsert and the version update happen in the same database transaction**. Either both commit or neither does. The registry can never be stale relative to the source-of-truth `document_versions` table.
 
+<div class="cs-callout insight"><span class="ic"></span><div class="bd"><strong>Key insight</strong><p>An index is a cache you never have to remember to invalidate — because it lives inside the database's transaction boundary. The registry row and the version update commit together, so the read side can't drift from the source of truth.</p></div></div>
+
 For documents that existed *before* the registry was introduced, I wrote a one-time backfill script. It walked the existing `document_versions` table and populated the registry in batches of 500, inside a transaction per batch. The backfill took about 4 minutes in production for several hundred thousand document versions.
 
 ## The migration plan
@@ -226,6 +240,8 @@ A few honest retrospective thoughts:
 2. **Dual-write is under-rated for migrations.** The four-phase rollout (dual-write → backfill → read-flip → cleanup) is boring and slow, but it caught a latent bug (the archival job race) that would have been a production incident if we had done a big-bang cutover. For data migrations that affect a hot path, **always dual-write before you flip the read side**.
 3. **Reconciliation jobs pay for themselves forever.** The nightly reconciliation is still running. It has caught one additional issue since launch (a bug in a bulk-import tool that bypassed the service layer) and that was free because the alerting was already plumbed in.
 4. **Database indexes are a form of caching.** I spent a lot of words earlier in this piece distinguishing "cache" from "index". They're the same thing on a spectrum: both are redundant data structures that store a precomputed answer to a frequent question. The difference is that a well-chosen index is inside the transactional boundary of the database, so it can't go stale the way a Redis cache can. If you can fit your hot query into an indexed path, you should always prefer it to a cache.
+
+<div class="cs-pullquote">Move a frequently-asked question out of the storage layer and into an indexed projection inside your transactional database — the highest-ROI pattern I apply in backend work.</div>
 
 ## What transfers to other systems
 
