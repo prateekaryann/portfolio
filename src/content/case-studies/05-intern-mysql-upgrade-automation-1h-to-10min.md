@@ -6,6 +6,7 @@ publishedAt: "2026-04-12"
 stack: ["Python", "Ansible", "MySQL", "Jenkins", "Bash"]
 order: 5
 featured: true
+accent: "pink"
 ---
 
 # Automating MySQL cluster upgrades from 1 hour to 10 minutes as an intern

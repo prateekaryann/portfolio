@@ -6,6 +6,7 @@ publishedAt: "2026-04-11"
 stack: ["AWS Step Functions", "AWS Bedrock", "AWS Lambda", "Amazon S3", "PostgreSQL"]
 order: 2
 featured: true
+accent: "indigo"
 ---
 
 # Orchestrating multi-step LLM workflows with AWS Step Functions and Bedrock

@@ -6,6 +6,7 @@ publishedAt: "2026-04-11"
 stack: ["FastAPI", "PostgreSQL", "AWS S3", "SQLAlchemy", "Alembic"]
 order: 1
 featured: true
+accent: "cyan"
 ---
 
 # Cutting a clinical document retrieval API from 7s to 50ms

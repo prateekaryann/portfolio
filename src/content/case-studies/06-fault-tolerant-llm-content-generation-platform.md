@@ -6,6 +6,7 @@ publishedAt: "2026-06-19"
 stack: ["Python", "FastAPI", "PostgreSQL", "RAG", "Prompt Caching", "Anthropic Claude", "AWS"]
 order: 0
 featured: true
+accent: "violet"
 ---
 
 # A fault-tolerant, cost-optimized LLM platform for clinical document generation

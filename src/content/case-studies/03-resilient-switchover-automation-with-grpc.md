@@ -6,6 +6,7 @@ publishedAt: "2026-04-11"
 stack: ["gRPC", "Python", "PostgreSQL", "Distributed Systems", "Protocol Buffers"]
 order: 3
 featured: true
+accent: "amber"
 ---
 
 # Building resilient switchover automation for distributed DB clusters with gRPC

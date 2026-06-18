@@ -2,142 +2,297 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const caseStudies = (await getCollection('case-studies'))
-  .filter((entry) => entry.data.featured)
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const studies = (await getCollection('case-studies'))
+  .filter((e) => e.data.featured)
   .sort((a, b) => a.data.order - b.data.order);
 
+const readMins = (e) => Math.max(2, Math.round((e.body?.split(/\s+/).length ?? 0) / 200));
+
+const ACCENTS = {
+  violet: ['#a78bfa', '#22d3ee'],
+  cyan:   ['#22d3ee', '#0ea5e9'],
+  indigo: ['#818cf8', '#c084fc'],
+  amber:  ['#f5b14c', '#ec4899'],
+  teal:   ['#2dd4bf', '#22d3ee'],
+  pink:   ['#ec4899', '#a78bfa'],
+};
+
+function cover(accent, n) {
+  const [a, b] = ACCENTS[accent] ?? ACCENTS.violet;
+  const id = `g${n}`;
+  return `<svg viewBox="0 0 400 225" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/>
+      </linearGradient>
+      <radialGradient id="${id}r" cx="0.7" cy="0.25" r="0.8">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.45"/><stop offset="0.6" stop-color="#ffffff" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="400" height="225" fill="url(#${id})"/>
+    <rect width="400" height="225" fill="url(#${id}r)"/>
+    <g fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.2">
+      <circle cx="305" cy="60" r="34"/><circle cx="305" cy="60" r="62"/>
+      <path d="M40 175 L120 130 L210 160 L300 110 L370 140"/>
+    </g>
+    <g fill="#ffffff" fill-opacity="0.9">
+      <circle cx="40" cy="175" r="4"/><circle cx="120" cy="130" r="4"/><circle cx="210" cy="160" r="4"/><circle cx="300" cy="110" r="4"/>
+    </g>
+    <text x="28" y="74" font-family="'Space Grotesk',sans-serif" font-size="64" font-weight="700" fill="#ffffff" fill-opacity="0.9">0${n}</text>
+  </svg>`;
+}
+
+const skills = [
+  { icon: 'server', title: 'Backend', items: ['Python', 'FastAPI', 'PostgreSQL', 'SQLAlchemy', 'gRPC', 'REST'] },
+  { icon: 'brain', title: 'AI / LLM', items: ['RAG pipelines', 'Prompt caching', 'Model tiering', 'Agent orchestration', 'Bedrock / Claude', 'OpenSearch'] },
+  { icon: 'cloud', title: 'Cloud & DevOps', items: ['AWS', 'EKS / K8s', 'Docker', 'Terraform', 'Helm', 'CI/CD'] },
+  { icon: 'data', title: 'Data & Systems', items: ['Distributed systems', 'MongoDB', 'Redis', 'Kafka', 'Step Functions', 'Observability'] },
+];
+
+const projects = [
+  { name: 'documind', desc: 'Production-grade RAG Q&A API — FastAPI + pgvector + Celery + SSE', url: 'https://github.com/prateekaryann/documind' },
+  { name: 'deep-focus-studio', desc: 'Neuroscience-backed ambient sound & focus timer (live)', url: 'https://github.com/prateekaryann/deep-focus-studio' },
+  { name: 'dj-visualizer', desc: 'Real-time mic-reactive 3D WebGL visualizer', url: 'https://github.com/prateekaryann/dj-visualizer' },
+  { name: 'mcp-servers', desc: 'Collection of MCP servers with shared transport and OAuth', url: 'https://github.com/prateekaryann/mcp-servers' },
+  { name: 'github-mcp', desc: 'MCP server wrapping GitHub CLI for Claude integration', url: 'https://github.com/prateekaryann/github-mcp' },
+];
+
+const ICONS = {
+  server: '<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><line x1="7" y1="7.5" x2="7" y2="7.5"/><line x1="7" y1="16.5" x2="7" y2="16.5"/>',
+  brain: '<path d="M9 3a3 3 0 0 0-3 3 3 3 0 0 0-1 5.8A3 3 0 0 0 7 17a3 3 0 0 0 5 1 3 3 0 0 0 5-1 3 3 0 0 0 2-5.2A3 3 0 0 0 18 6a3 3 0 0 0-3-3 3 3 0 0 0-3 1.5A3 3 0 0 0 9 3Z"/>',
+  cloud: '<path d="M17.5 19a4.5 4.5 0 0 0 .5-9 6 6 0 0 0-11.6-1.5A4 4 0 0 0 6.5 19Z"/>',
+  data: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',
+};
+const ico = (n) => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+
 const pageTitle = 'Prateek Aryan — Senior Software Engineer · LLM/GenAI & Distributed Systems';
-const pageDescription =
-  'Senior Software Engineer building production LLM/GenAI systems and distributed backends on Python, FastAPI, and AWS. AI Engineer on the Gilead Sciences clinical content-generation platform. Case studies and open-source projects.';
+const pageDescription = 'Senior Software Engineer building production LLM/GenAI systems and distributed backends on Python, FastAPI, and AWS. AI Engineer on the Gilead Sciences clinical content-generation platform.';
 ---
 
 <Base title={pageTitle} description={pageDescription}>
-  <section class="hero">
-    <h1>Prateek Aryan</h1>
-    <p class="tagline">
-      Senior Software Engineer building production <strong>LLM/GenAI systems</strong> and
-      distributed backends on <strong>Python</strong>, <strong>FastAPI</strong>, and
-      <strong>AWS</strong>. Based in Bengaluru · Comfortable across US and EU overlap.
-    </p>
+  <!-- HERO -->
+  <section class="hero wrap">
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+    <div class="hero-inner">
+      <span class="badge" data-reveal><span class="dot"></span> Open to senior backend / AI engineering contracts</span>
+      <h1 data-reveal data-delay="1">Production <span class="grad-text">LLM&nbsp;systems</span> &amp; distributed backends that don't fall over.</h1>
+      <p class="lead" data-reveal data-delay="2">
+        I'm <strong>Prateek Aryan</strong> — a Senior Software Engineer building fault-tolerant
+        GenAI and platform systems on <strong>Python, FastAPI, and AWS</strong>. Currently an
+        <strong>AI Engineer on the Gilead Sciences</strong> clinical content-generation platform.
+      </p>
+      <div class="hero-cta" data-reveal data-delay="3">
+        <a href="#case-studies" class="btn btn-primary">View case studies
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a href={`${base}/Prateek_Aryan_Resume.pdf`} class="btn btn-ghost" target="_blank" rel="noopener">Download résumé</a>
+      </div>
+      <div class="chips" data-reveal data-delay="3">
+        <span class="chip">RAG pipelines</span><span class="chip">LLM orchestration</span><span class="chip">FastAPI</span><span class="chip">AWS / EKS</span><span class="chip">Distributed systems</span>
+      </div>
+    </div>
+    <div class="scroll-cue" aria-hidden="true"><span>scroll</span><span class="line"></span></div>
+  </section>
 
-    <div class="chips">
-      <span class="chip">Python</span>
-      <span class="chip">FastAPI</span>
-      <span class="chip">AWS</span>
-      <span class="chip">RAG Pipelines</span>
-      <span class="chip">LLM Orchestration</span>
-      <span class="chip">Distributed Systems</span>
-      <span class="chip">Platform Reliability</span>
+  <!-- WORK / NUMBERS -->
+  <section class="block wrap" id="work">
+    <div class="xp-strip" data-reveal>
+      <span class="org">Gilead Sciences</span><span class="org">Cisco Systems</span><span class="org">UsefulBI</span><span class="org">BMS College</span>
+    </div>
+    <div class="stats narrow" style="margin: 3rem auto 0;">
+      <div class="stat" data-reveal><div class="num">5+</div><div class="lbl">Years building production systems</div></div>
+      <div class="stat" data-reveal data-delay="1"><div class="num">200+</div><div class="lbl">Enterprise apps supported at Cisco</div></div>
+      <div class="stat" data-reveal data-delay="2"><div class="num">99.3%</div><div class="lbl">Latency cut on doc retrieval</div></div>
+      <div class="stat" data-reveal data-delay="3"><div class="num">~90%</div><div class="lbl">LLM token-cost reduction</div></div>
     </div>
   </section>
 
-  <section>
-    <h2>About</h2>
-    <p>
-      I build backend and LLM systems that stay up when things get hard.
-    </p>
-    <p>
-      Right now I'm an <strong>AI Engineer on the Gilead Sciences</strong> clinical
-      content-generation platform (via <a href="https://usefulbi.com">UsefulBI</a>),
-      building the production systems behind automated CSR, DSUR, and PLPS generation:
-      fault-tolerant LLM orchestration with durable execution, an idempotent RAG pipeline,
-      prompt-caching and model-tiering cost controls (~85% lower latency, ~90% lower token
-      cost on high-volume instructions), and the observability that keeps generation
-      quality measurable in production. Full write-up
-      <a href={import.meta.env.BASE_URL + '/case-studies/06-fault-tolerant-llm-content-generation-platform/'}>here</a>.
-    </p>
-    <p>
-      That engagement grew out of a platform I <strong>built and solely owned</strong> at
-      UsefulBI — an AI clinical-document POC on FastAPI + PostgreSQL with a 5-stage RAG
-      pipeline and <strong>21 CFR Part 11</strong> audit trails, section-level versioning,
-      and RBAC. It became the demo that won the Gilead engagement. My most measurable win
-      there: cutting a clinical document retrieval API from
-      <strong>7–8 seconds to under 50ms — a 99.3% reduction</strong> — by replacing
-      synchronous S3 polling with a database registry and turning O(n) prefix scans into
-      O(1) indexed queries
-      (<a href={import.meta.env.BASE_URL + '/case-studies/01-cutting-document-retrieval-from-7s-to-50ms/'}>write-up</a>),
-      and orchestrating the generation pipeline on AWS Step Functions + Bedrock
-      (<a href={import.meta.env.BASE_URL + '/case-studies/02-llm-orchestration-with-step-functions-and-bedrock/'}>write-up</a>).
-    </p>
-    <p>
-      Before UsefulBI, I spent five years at
-      <strong>Cisco Systems</strong> building the platform automation that kept
-      <strong>200+ enterprise applications</strong> reliable: MySQL upgrades, Postgres
-      provisioning, Oracle switchover, production-to-non-prod refresh workflows, MongoDB
-      cluster operations, and a resilient switchover system using gRPC across
-      primary/standby clusters. Along the way I cut SOX compliance reporting from 3+ hours
-      to under 10 minutes and reduced manual DBA workload by 80%.
-    </p>
-    <p class="muted small">
-      <strong>Certified:</strong> MongoDB DBA · AWS Certified Cloud Practitioner · HashiCorp
-      Terraform Associate · PCAP — Python Programming.
-    </p>
-    <p class="muted small">
-      <strong>Education:</strong> B.E. Computer Science, BMS College of Engineering (9.2 GPA).
-    </p>
+  <!-- ABOUT -->
+  <section class="block wrap" id="about">
+    <div class="section-head narrow" data-reveal>
+      <span class="eyebrow">About</span>
+      <h2>I build backend &amp; LLM systems that stay up when things get hard.</h2>
+    </div>
+    <div class="about-grid narrow">
+      <div class="glass about-card" data-reveal>
+        <p>
+          Right now I'm an <strong>AI Engineer on the Gilead Sciences</strong> clinical
+          content-generation platform (via <a href="https://usefulbi.com" target="_blank" rel="noopener">UsefulBI</a>),
+          building the production systems behind automated CSR, DSUR, and PLPS generation:
+          fault-tolerant LLM orchestration with durable execution, an idempotent RAG pipeline,
+          and prompt-caching &amp; model-tiering cost controls.
+        </p>
+        <p>
+          That engagement grew out of a platform I <strong>built and solely owned</strong> at
+          UsefulBI — an AI clinical-document POC with a 5-stage RAG pipeline and 21 CFR Part 11
+          audit trails. It became the demo that won the Gilead engagement.
+        </p>
+        <p>
+          Before that, five years at <strong>Cisco Systems</strong> kept 200+ enterprise apps
+          reliable — database automation, gRPC switchover systems, and a SOX pipeline cut from
+          3+ hours to under 10 minutes.
+        </p>
+      </div>
+      <div data-reveal data-delay="1">
+        <div class="avatar">PA</div>
+        <ul class="facts">
+          <li><span set:html={ico('cloud')} /> Bengaluru, India · US/EU overlap</li>
+          <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m12 2 2.5 6.5L21 9l-5 4 1.5 7L12 16l-5.5 4L8 13 3 9l6.5-.5z"/></svg> 9.2 GPA · B.E. CS, BMS College</li>
+          <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> AWS · Terraform · MongoDB · PCAP certified</li>
+        </ul>
+      </div>
+    </div>
   </section>
 
-  <section id="case-studies">
-    <h2>Case studies</h2>
-    {
-      caseStudies.map((entry) => (
-        <a
-          class="case-study-card"
-          href={`${import.meta.env.BASE_URL}/case-studies/${entry.id}/`}
-        >
-          <h3>{entry.data.title}</h3>
-          <p>{entry.data.description}</p>
-          <span class="meta">{entry.data.stack.join(' · ')}</span>
+  <!-- CASE STUDIES -->
+  <section class="block wrap" id="case-studies">
+    <div class="section-head" data-reveal>
+      <span class="eyebrow">Case studies</span>
+      <h2>Deep dives into real systems I've shipped.</h2>
+      <p>Sanitized architectural write-ups — the patterns, trade-offs, and failure-modes are real.</p>
+    </div>
+    <div class="cs-grid">
+      {studies.map((e, i) => (
+        <a class={`glass cs-card${e.data.order === 0 ? ' featured' : ''}`} href={`${base}/case-studies/${e.id}/`} data-reveal data-delay={i % 3}>
+          <div class="cs-cover" set:html={cover(e.data.accent ?? 'violet', e.data.order)} />
+          <div class="cs-body">
+            <div class="cs-meta">
+              {e.data.order === 0 && <span class="tag-featured">Flagship</span>}
+              <span>{e.data.stack[0]}</span><span>·</span><span>{readMins(e)} min read</span>
+            </div>
+            <h3>{e.data.title}</h3>
+            <p class="desc">{e.data.description}</p>
+            <div class="cs-foot">
+              <div class="chips">{e.data.stack.slice(0, 3).map((s) => <span class="chip">{s}</span>)}</div>
+              <span class="arrow">Read
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </span>
+            </div>
+          </div>
         </a>
-      ))
+      ))}
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section class="block wrap" id="skills">
+    <div class="section-head" data-reveal>
+      <span class="eyebrow">Toolkit</span>
+      <h2>What I work with.</h2>
+    </div>
+    <div class="skill-grid">
+      {skills.map((s, i) => (
+        <div class="glass skill-card" data-reveal data-delay={i % 3}>
+          <div class="head">
+            <span set:html={ico(s.icon)} /><h3>{s.title}</h3>
+          </div>
+          <div class="chips">{s.items.map((it) => <span class="chip">{it}</span>)}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="block wrap" id="projects">
+    <div class="section-head" data-reveal>
+      <span class="eyebrow">Open source</span>
+      <h2>Things I've built for fun &amp; reference.</h2>
+    </div>
+    <div class="proj-grid">
+      {projects.map((p, i) => (
+        <a class="glass proj-card" href={p.url} target="_blank" rel="noopener" data-reveal data-delay={i % 3}>
+          <div class="top">
+            <span class="name">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12 12 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+              {p.name}
+            </span>
+            <svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </div>
+          <span class="desc">{p.desc}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="block wrap" id="contact">
+    <div class="glass cta" data-reveal>
+      <span class="eyebrow" style="justify-content:center">Contact</span>
+      <h2>Let's build something <span class="grad-text">resilient</span>.</h2>
+      <p>Open to senior backend and AI/LLM engineering contracts. The fastest way to reach me is email.</p>
+      <div class="cta-actions">
+        <a href="mailto:prateekaryyan@gmail.com" class="btn btn-primary">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 6 10-6"/></svg>
+          prateekaryyan@gmail.com
+        </a>
+        <a href="https://linkedin.com/in/prateek-aryan" class="btn btn-ghost" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://github.com/prateekaryann" class="btn btn-ghost" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function initHero() {
+      const canvas = document.getElementById('hero-canvas');
+      if (!canvas || canvas.dataset.inited) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      canvas.dataset.inited = '1';
+      import(/* @vite-ignore */ 'https://esm.sh/three@0.160.0').then((THREE) => {
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+        camera.position.z = 5;
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const group = new THREE.Group();
+        const geo = new THREE.IcosahedronGeometry(2.1, 1);
+        const wire = new THREE.LineSegments(
+          new THREE.WireframeGeometry(geo),
+          new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.55 })
+        );
+        const pts = new THREE.Points(
+          geo,
+          new THREE.PointsMaterial({ color: 0x22d3ee, size: 0.06, transparent: true, opacity: 0.9 })
+        );
+        group.add(wire); group.add(pts);
+
+        const starGeo = new THREE.BufferGeometry();
+        const N = 320, arr = new Float32Array(N * 3);
+        for (let i = 0; i < N * 3; i++) arr[i] = (Math.random() - 0.5) * 18;
+        starGeo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
+        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xa78bfa, size: 0.03, transparent: true, opacity: 0.5 }));
+        scene.add(stars); scene.add(group);
+
+        let mx = 0, my = 0;
+        window.addEventListener('pointermove', (e) => {
+          mx = (e.clientX / window.innerWidth - 0.5);
+          my = (e.clientY / window.innerHeight - 0.5);
+        });
+
+        function resize() {
+          const r = canvas.getBoundingClientRect();
+          renderer.setSize(r.width, r.height, false);
+          camera.aspect = r.width / r.height; camera.updateProjectionMatrix();
+        }
+        resize();
+        window.addEventListener('resize', resize);
+        canvas.classList.add('ready');
+
+        let raf;
+        (function loop() {
+          raf = requestAnimationFrame(loop);
+          group.rotation.y += 0.0024; group.rotation.x += 0.0011;
+          group.position.x += (mx * 1.4 - group.position.x) * 0.05;
+          group.position.y += (-my * 1 - group.position.y) * 0.05;
+          stars.rotation.y += 0.0004;
+          renderer.render(scene, camera);
+        })();
+
+        document.addEventListener('astro:before-swap', () => { cancelAnimationFrame(raf); }, { once: true });
+      }).catch(() => {});
     }
-  </section>
-
-  <section id="projects">
-    <h2>Open-source projects</h2>
-    <ul class="project-list">
-      <li>
-        <span class="name">
-          <a href="https://github.com/prateekaryann/documind">documind</a>
-        </span>
-        <span class="desc">Production-grade RAG Q&A API — FastAPI + pgvector + Celery + SSE</span>
-      </li>
-      <li>
-        <span class="name">
-          <a href="https://github.com/prateekaryann/deep-focus-studio">deep-focus-studio</a>
-        </span>
-        <span class="desc">Neuroscience-backed ambient sound & focus timer (live)</span>
-      </li>
-      <li>
-        <span class="name">
-          <a href="https://github.com/prateekaryann/dj-visualizer">dj-visualizer</a>
-        </span>
-        <span class="desc">Real-time mic-reactive 3D WebGL visualizer</span>
-      </li>
-      <li>
-        <span class="name">
-          <a href="https://github.com/prateekaryann/mcp-servers">mcp-servers</a>
-        </span>
-        <span class="desc">Collection of MCP servers with shared transport and OAuth</span>
-      </li>
-      <li>
-        <span class="name">
-          <a href="https://github.com/prateekaryann/github-mcp">github-mcp</a>
-        </span>
-        <span class="desc">MCP server wrapping GitHub CLI for Claude integration</span>
-      </li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>Contact</h2>
-    <p>
-      <a href="mailto:prateekaryyan@gmail.com">prateekaryyan@gmail.com</a> ·
-      <a href="https://github.com/prateekaryann">github.com/prateekaryann</a> ·
-      <a href="https://linkedin.com/in/prateek-aryan">linkedin.com/in/prateek-aryan</a>
-    </p>
-    <p class="muted small">
-      Focus areas: LLM/GenAI platforms, RAG systems, distributed systems, platform reliability.
-    </p>
-  </section>
+    document.addEventListener('astro:page-load', initHero);
+  </script>
 </Base>
