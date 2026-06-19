@@ -465,3 +465,36 @@ section.block { padding-block: clamp(3.5rem, 8vw, 6.5rem); position: relative; }
 .cs-figure svg, .cs-figure img { width: 100%; height: auto; display: block; border: 0; margin: 0; border-radius: 0; }
 .cs-figure figcaption { margin-top: .85rem; font-size: .82rem; color: var(--fg-subtle); text-align: center; font-family: var(--font-mono); }
 .cs-figure .canvas text { font-family: var(--font-sans); }
+
+/* ============================================================
+   Project detail pages
+   ============================================================ */
+.proj-actions { display: flex; flex-wrap: wrap; gap: .8rem; margin-top: 1.8rem; }
+.proj-actions .btn .ico { width: 17px; height: 17px; }
+
+.proj-main { padding-bottom: 1.5rem; }
+
+.proj-hero {
+  border-radius: var(--r-lg); overflow: hidden;
+  border: 1px solid var(--glass-brd); box-shadow: var(--shadow);
+  margin: 0 0 2.2rem; line-height: 0;
+}
+.proj-hero img, .proj-hero svg { display: block; width: 100%; height: auto; }
+
+.proj-figure { margin: 0 0 2.4rem; }
+.proj-figure .canvas {
+  background: var(--bg-1); border: 1px solid var(--glass-brd);
+  border-radius: var(--r-lg); overflow: hidden; line-height: 0;
+}
+.proj-figure video { width: 100%; height: auto; display: block; background: #000; }
+.proj-figure figcaption { margin-top: .85rem; font-size: .82rem; color: var(--fg-subtle); text-align: center; font-family: var(--font-mono); }
+
+.proj-prose { max-width: var(--w-prose); }
+.proj-arch { margin-top: 1rem; }
+.proj-arch > h2 {
+  font-family: var(--font-display); position: relative; padding-left: 1rem; margin: 2.6rem 0 1.2rem;
+}
+.proj-arch > h2::before {
+  content: ""; position: absolute; left: 0; top: .15em; bottom: .15em;
+  width: 4px; border-radius: 4px; background: var(--grad);
+}

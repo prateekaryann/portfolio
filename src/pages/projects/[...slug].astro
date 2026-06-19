@@ -1,0 +1,112 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import { panel } from '../../lib/covers';
+
+export async function getStaticPaths() {
+  const entries = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return entries.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, prev: entries[i - 1] ?? null, next: entries[i + 1] ?? null },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  prev: CollectionEntry<'projects'> | null;
+  next: CollectionEntry<'projects'> | null;
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+const { title, tagline, description, stack, github, live, glyph, accent, banner, demoVideo, demoPoster, architecture } = entry.data;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+
+const bannerUrl = banner ? base + banner : null;
+const videoUrl = demoVideo ? base + demoVideo : null;
+const posterUrl = demoPoster ? base + demoPoster : null;
+const archUrl = architecture ? base + architecture : null;
+const ogImage = bannerUrl ? new URL(bannerUrl, Astro.site).toString() : undefined;
+---
+
+<Base title={`${title} — Prateek Aryan`} description={description} ogImage={ogImage}>
+  <header class="cs-masthead wrap narrow">
+    <a href={`${base}/#projects`} class="back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> All projects
+    </a>
+    <h1 data-reveal>{title}</h1>
+    <p class="sub" data-reveal data-delay="1">{tagline}</p>
+    <div class="masthead-meta" data-reveal data-delay="1">
+      <span><b>{stack[0]}</b></span><span>Open source</span>{live && <span><b>Live</b></span>}
+    </div>
+    <div class="chips" data-reveal data-delay="2">{stack.map((s) => <span class="chip">{s}</span>)}</div>
+
+    <div class="proj-actions" data-reveal data-delay="2">
+      {live && (
+        <a href={live} class="btn btn-primary" target="_blank" rel="noopener">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          Live demo
+        </a>
+      )}
+      <a href={github} class="btn btn-ghost" target="_blank" rel="noopener">
+        <svg class="ico" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.3-1.7-1.3-1.7-1.06-.72.08-.71.08-.71 1.17.08 1.79 1.2 1.79 1.2 1.04 1.79 2.73 1.27 3.4.97.1-.76.41-1.27.74-1.56-2.55-.29-5.23-1.28-5.23-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.69 5.41-5.25 5.69.42.36.79 1.08.79 2.18v3.23c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+        View source
+      </a>
+    </div>
+  </header>
+
+  <div class="wrap narrow proj-main">
+    <!-- Banner -->
+    <div class="proj-hero" data-reveal>
+      {bannerUrl
+        ? <img src={bannerUrl} alt={`${title} banner`} width="1200" height="630" />
+        : <Fragment set:html={panel(accent, glyph, 'hero' + entry.id, 210)} />}
+    </div>
+
+    <!-- Demo video -->
+    {videoUrl && (
+      <figure class="proj-figure" data-reveal>
+        <div class="canvas">
+          <video controls preload="metadata" playsinline poster={posterUrl ?? undefined}>
+            <source src={videoUrl} type="video/mp4" />
+            Your browser doesn't support embedded video — <a href={live ?? github}>open the project</a> instead.
+          </video>
+        </div>
+        <figcaption>Demo — {title} in action</figcaption>
+      </figure>
+    )}
+
+    <!-- Description -->
+    <article class="prose proj-prose"><Content /></article>
+
+    <!-- Architecture -->
+    {archUrl && (
+      <section class="proj-arch">
+        <h2>Architecture</h2>
+        <figure class="cs-figure" data-reveal>
+          <div class="canvas"><img src={archUrl} alt={`${title} architecture diagram`} /></div>
+          <figcaption>How {title} fits together</figcaption>
+        </figure>
+      </section>
+    )}
+
+    <!-- Prev / next -->
+    <nav class="cs-nav">
+      {prev ? (
+        <a class="glass prev" href={`${base}/projects/${prev.id}/`}><span class="dir">← Previous</span><span class="t">{prev.data.title}</span></a>
+      ) : <span />}
+      {next ? (
+        <a class="glass next" href={`${base}/projects/${next.id}/`}><span class="dir">Next →</span><span class="t">{next.data.title}</span></a>
+      ) : <span />}
+    </nav>
+
+    <section class="block" style="text-align:center; padding-block: 3rem 1rem;">
+      <h2 style="border:0; margin-bottom:1rem;">Like what you see?</h2>
+      <div class="cta-actions">
+        <a href="mailto:prateekaryyan@gmail.com" class="btn btn-primary">Get in touch</a>
+        <a href={`${base}/#projects`} class="btn btn-ghost">More projects</a>
+      </div>
+    </section>
+  </div>
+</Base>
