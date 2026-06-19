@@ -19,6 +19,8 @@ accent: "amber"
 
 The database platform team I joined at Cisco ran several hundred primary-standby database clusters for internal enterprise applications. Switchovers — promoting a standby to primary for maintenance, patching, or recovery — were done through a mix of REST calls, shell scripts, and human eyeballs. Failures were common and diagnostics were painful. I replaced that system with a **gRPC-based switchover orchestrator** that modeled the switchover as an explicit state machine, used bidirectional streaming for live progress, and made recovery from partial failures trivial. The new system cut median switchover time by more than half, eliminated an entire class of split-brain scenarios, and became the default operational tool for the team within a quarter.
 
+<div class="cs-statrow"><div class="s"><div class="v">22→9min</div><div class="l">median switchover</div></div><div class="s"><div class="v">0</div><div class="l">split-brain (was 2)</div></div><div class="s"><div class="v">40→5min</div><div class="l">operator time / run</div></div><div class="s"><div class="v">100s</div><div class="l">clusters automated</div></div></div>
+
 ## The starting point
 
 The existing switchover tool was a small Python service that exposed REST endpoints. A typical switchover looked like this:
@@ -103,14 +105,10 @@ Two design choices in there that earned their keep:
 
 On the server side, a switchover was modeled as an explicit state machine:
 
-```
-  PRE_FLIGHT_CHECKS → QUIESCE_WRITES → WAIT_FOR_REPLICATION_CATCHUP
-    → PROMOTE_STANDBY → REPOINT_CLIENT_TRAFFIC
-    → POST_SWITCHOVER_VALIDATION → CLEANUP → COMPLETED
-
-  Any stage can transition to FAILED (with reason + recovery hints)
-  or ABORTED (by operator action).
-```
+<figure class="cs-figure">
+<div class="canvas"><img src="/portfolio/diagrams/arch03.svg" alt="gRPC switchover state machine: pre-flight, quiesce, catch-up, fence, promote, validate; a fencing step before promotion prevents split-brain." loading="lazy" /></div>
+<figcaption>Every stage is an explicit, observable state persisted in Postgres. A fencing step before promotion makes split-brain impossible; any stage can fail to FAILED/ABORTED and resume from the database.</figcaption>
+</figure>
 
 The state machine lives in PostgreSQL — one row per switchover with the current stage, start time, operator, cluster, and a JSON blob for stage-specific context. Every state transition is a SQL `UPDATE` inside a transaction.
 
@@ -152,7 +150,7 @@ This was the scariest one. The sequence:
 
 The fix was a **fencing step** inserted between `WAIT_FOR_REPLICATION_CATCHUP` and `PROMOTE_STANDBY`. Before promoting the standby, the server explicitly kills the old primary's ability to accept writes — either by flipping it to read-only at the database layer, by removing it from the load balancer, or in the worst case by STONITH. Only after fencing succeeds does the promotion start.
 
-**Lesson:** in primary-standby failover, fence before you promote. Always. No exceptions. Split brain is not a problem you can fix after the fact.
+<div class="cs-callout warn"><span class="ic"></span><div class="bd"><strong>Fence before you promote</strong><p>Always. No exceptions. Split-brain is not a problem you can fix after the fact — so the fencing step (kill the old primary’s writes before promoting the standby) is non-negotiable in any failover automation.</p></div></div>
 
 ## The operational wins
 
@@ -173,6 +171,8 @@ The most interesting metric is the last one: **average operator time per switcho
 2. **Emit events to a message bus, not just the stream.** Later, I wanted to build a dashboard showing every switchover across the fleet in real time. If I were rebuilding, I'd fan events out to both the gRPC stream and a Kafka topic.
 3. **Make "resume from stage N" a first-class CLI command.** I built this after the fact as a janky admin endpoint. It should have been supported from the start.
 4. **Version the proto before you ship.** I used `package switchover.v1` from the start, which saved me once when I needed to add a field without breaking existing clients.
+
+<div class="cs-pullquote">Model long-running operations as state machines, expose their state over a streaming protocol, and keep the authoritative state in a transactional database.</div>
 
 ## What transfers
 

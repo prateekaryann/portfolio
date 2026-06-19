@@ -21,6 +21,8 @@ metricLabel: "SOX reporting, automated"
 
 SOX compliance reports on our database platform used to take an engineer **3+ hours per quarter** to produce: pulling data from five different systems, reconciling discrepancies by hand, formatting the output for the audit team, and fielding follow-up questions. I built an automated pipeline that produced the same report, reconciled against the same sources, and formatted it identically — **in under 10 minutes, end to end**. More importantly, the new pipeline left an audit trail that made the report itself easier for auditors to verify. The headline number is "3+ hours to under 10 minutes", which is an 18× speedup. The real wins were elsewhere.
 
+<div class="cs-statrow"><div class="s"><div class="v">18×</div><div class="l">faster (3h→10min)</div></div><div class="s"><div class="v">15→0</div><div class="l">auditor follow-ups</div></div><div class="s"><div class="v">0</div><div class="l">variance between engineers</div></div><div class="s"><div class="v">3d→2h</div><div class="l">time to first send</div></div></div>
+
 ## Context: what the report was
 
 Our team ran database clusters for 200+ internal enterprise applications. Some of those applications were SOX-in-scope, meaning changes to them had to be audited under Sarbanes-Oxley controls. The audit team asked our team for a quarterly report that answered questions like:
@@ -63,26 +65,10 @@ And I added a requirement: the report's output had to make all three of those an
 
 ## The pipeline
 
-```
-  [1. Snapshot phase]  For each source, run the query, save raw output
-                       to S3 with a timestamp, record the query + source
-                       + hash in an "evidence" table in PostgreSQL.
-
-  [2. Load phase]      Load each snapshot into a staging table in
-                       PostgreSQL. One staging table per source.
-
-  [3. Reconcile phase] Run SQL join queries across staging tables to
-                       answer each audit question. Results go into a
-                       "findings" table.
-
-  [4. Render phase]    Jinja2 template turns findings into the auditor's
-                       expected XLSX format. Every row links back to its
-                       evidence ID.
-
-  [5. Audit log phase] Emit a structured log bundle containing every
-                       query, timestamp, hash, row count, and triggering
-                       user.
-```
+<figure class="cs-figure">
+<div class="canvas"><img src="/portfolio/diagrams/arch04.svg" alt="SOX reporting pipeline: snapshot, load, reconcile, render, audit log; every stage writes to an evidence table tying each report row to its source." loading="lazy" /></div>
+<figcaption>Snapshot first, process second — and every stage writes to an evidence table, so every report row traces back to the exact query, timestamp, hash, and raw source.</figcaption>
+</figure>
 
 The whole thing runs in a single Jenkins job, takes arguments for "which quarter" and "which clusters in scope", and writes the final artifacts to a dated folder in S3.
 
@@ -125,6 +111,8 @@ Every row in the final report has a column called `evidence_id` that points to t
 5. Pull the raw output from S3 and re-run the query to verify it's byte-identical
 
 This turned what used to be a "trust us, here's a spreadsheet" deliverable into "here's the spreadsheet, here's the SQL that produced every row, and here's the raw source data." **The first quarter after I shipped this, the auditor follow-up question volume dropped from roughly 15 per report to zero.**
+
+<div class="cs-callout insight"><span class="ic"></span><div class="bd"><strong>The auditor is a user</strong><p>They need to verify your claims, and they care about reproducibility and traceability more than speed. Once you treat them as a user group, "what would make this easier to verify?" becomes a better design question than "what does the template require?"</p></div></div>
 
 ## The three non-obvious lessons
 
@@ -172,6 +160,8 @@ The upside: the engineering team started using the `sox_evidence` table for inte
 2. **Involve the audit team in the design phase.** I shipped v1 and iterated. I should have pulled auditors in before writing code.
 3. **Write a "compare two runs" tool alongside the pipeline.** Eventually I wanted to diff quarters. If the data model is good, a diff tool is ~200 lines.
 4. **Treat every query as a named asset in version control.** Named, versioned queries in source control are easier to review, diff, and trace.
+
+<div class="cs-pullquote">An automated report the auditor can’t verify isn’t faster — it’s just faster for us.</div>
 
 ## What transfers
 

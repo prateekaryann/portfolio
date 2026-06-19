@@ -25,6 +25,8 @@ In my fourth month, I automated the whole thing. The new upgrade tool took the s
 
 By my sixth month, the tool had replaced the manual playbook entirely for routine upgrades. By the time I converted from intern to full-time engineer, it had run more than a hundred upgrades without intervention. It became the first thing I'd ever built that outlived the reason I built it.
 
+<div class="cs-statrow"><div class="s"><div class="v">6×</div><div class="l">faster (60→10min)</div></div><div class="s"><div class="v">100+</div><div class="l">upgrades, year one</div></div><div class="s"><div class="v">0</div><div class="l">engineer variance</div></div><div class="s"><div class="v">13</div><div class="l">runbook steps automated</div></div></div>
+
 This piece is about the stuff nobody teaches you in school — how initiative actually gets rewarded on engineering teams, why unasked-for work is risky but high-leverage, and the specific lessons I learned from shipping my first real production automation.
 
 ## Setting the stage
@@ -72,6 +74,13 @@ The second version of the tool was Python on top of Ansible, with each step wrap
 3. Classified the result as `ok`, `ok-with-warning`, or `error`
 4. Emitted a structured log line with the classification
 5. Either continued, paused for human review (on warning), or aborted (on error)
+
+<figure class="cs-figure">
+<div class="canvas"><img src="/portfolio/diagrams/arch05.svg" alt="Per-step automation loop: run a step, classify its output as ok, ok-with-warning, error, or unknown, then continue, pause for a human, or abort." loading="lazy" /></div>
+<figcaption>The tool doesn't just run steps — it classifies each step's output. The "unknown" bucket ("I don't recognize this — pause for a human") is what makes the automation trustworthy.</figcaption>
+</figure>
+
+<div class="cs-callout insight"><span class="ic"></span><div class="bd"><strong>Classify outcomes, don't just execute</strong><p>A naive tool runs commands and checks exit codes. A trustworthy one classifies output against a known vocabulary — ok, warning, error, and crucially <em>unknown</em> — so "I don't recognize this" becomes a first-class outcome that pauses for a human instead of barrelling ahead.</p></div></div>
 
 The list of known patterns came from two sources. The runbook itself had some — phrases like "replication lag > 30 seconds" or "package not signed" that the runbook told humans to watch for. And I supplemented those with the things I saw in actual upgrade logs, going back through six months of past upgrades and pulling out every weird failure mode anyone had encountered.
 
@@ -126,6 +135,8 @@ I took a screenshot.
 The raw time improvement (60 min → 10 min) is the headline. The more interesting number is the last row: **the upgrades that modified the runbook went to zero, because the automation WAS the runbook**. Every improvement to the upgrade procedure now happened as a pull request to the tool, which meant every improvement was reviewed, tested, and preserved.
 
 Within the first year, the tool ran more than a hundred production upgrades. There was one incident during that time, and it turned out to be a misconfigured cluster rather than a tool bug. The tool correctly classified the step as an error and aborted before doing any damage.
+
+<div class="cs-pullquote">The automation had to replicate the attention, not just the commands.</div>
 
 ## The actual lessons
 
