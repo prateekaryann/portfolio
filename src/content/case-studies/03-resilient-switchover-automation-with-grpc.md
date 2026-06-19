@@ -7,6 +7,8 @@ stack: ["gRPC", "Python", "PostgreSQL", "Distributed Systems", "Protocol Buffers
 order: 3
 featured: true
 accent: "amber"
+metric: "22→9 min"
+metricLabel: "median switchover · 0 split-brain"
 ---
 
 # Building resilient switchover automation for distributed DB clusters with gRPC
