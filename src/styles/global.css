@@ -181,9 +181,6 @@ section.block { padding-block: clamp(3.5rem, 8vw, 6.5rem); position: relative; }
 @media (min-width: 1200px) { .site-header { padding: 35px 0; } }
 .brand { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: .2px; color: var(--fg); }
 @media (min-width: 1200px) { .brand { font-size: 18px; } }
-.nav-connect { position: absolute; left: 43%; top: 50%; translate: -50% -50%; display: none; font-size: 15px; letter-spacing: 1px; font-weight: 500; color: var(--fg-muted); }
-.nav-connect:hover { color: var(--accent); }
-@media (min-width: 1300px) { .nav-connect { display: block; } }
 .nav { display: flex; align-items: center; gap: 40px; }
 @media (min-width: 1200px) { .nav { gap: 52px; } }
 .nav a { color: var(--fg); font-size: 14px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
