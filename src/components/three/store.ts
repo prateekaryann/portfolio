@@ -15,6 +15,9 @@ export const refs = {
   actions: null as Record<string, THREE.AnimationAction | null> | null,
   current: 'sitting_idle',
   loaded: false,
+  /** play the hello wave (no-op while one is running) */
+  wave: null as (() => void) | null,
+  waving: false,
 };
 
 /** Camera keyframes per scroll stage. Units: metres, avatar sits at origin facing +Z, monitor at z≈0.95. */

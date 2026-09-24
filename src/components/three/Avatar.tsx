@@ -42,14 +42,24 @@ export function Avatar({ url, onLoaded }: Props) {
     refs.loaded = true;
     onLoaded?.();
 
-    // "hi" on arrival: the Mixamo wave, right-arm tracks only, layered over the seated idle.
+    // "hi": the Mixamo wave, right-arm tracks only, layered over the seated idle.
     // Weight >> 1 so the arm follows the wave rather than a 50/50 blend with the idle.
     let waveTimer = 0;
     let waveAction: THREE.AnimationAction | null = null;
+    const scheduleIdleWave = () => {
+      window.clearTimeout(waveTimer);
+      // keep saying hi every ~12s while the visitor is still on the landing stage
+      waveTimer = window.setTimeout(() => {
+        if (refs.stage === 'landing' && document.visibilityState === 'visible') refs.wave?.();
+        else scheduleIdleWave();
+      }, 11000 + Math.random() * 3000);
+    };
     const onFinished = (e: any) => {
       if (e.action !== waveAction) return;
       waveAction?.fadeOut(0.45);
       smile.current.on = false;
+      refs.waving = false;
+      scheduleIdleWave();
     };
     const waveClip = (animations as THREE.AnimationClip[]).find((c) => c.name === 'wave');
     if (waveClip) {
@@ -59,14 +69,19 @@ export function Avatar({ url, onLoaded }: Props) {
       waveAction.setLoop(THREE.LoopOnce, 1);
       waveAction.clampWhenFinished = false;
       mixer.addEventListener('finished', onFinished);
-      waveTimer = window.setTimeout(() => {
-        waveAction!.reset().setEffectiveTimeScale(1.1).setEffectiveWeight(8).fadeIn(0.35).play();
+      refs.wave = () => {
+        if (refs.waving || !waveAction) return;
+        refs.waving = true;
+        waveAction.reset().setEffectiveTimeScale(1.1).setEffectiveWeight(8).fadeIn(0.35).play();
         smile.current.on = true;
-      }, 700);
+      };
+      waveTimer = window.setTimeout(() => refs.wave?.(), 700);
     }
     return () => {
       window.clearTimeout(waveTimer);
       mixer.removeEventListener('finished', onFinished);
+      refs.wave = null;
+      refs.waving = false;
       refs.loaded = false;
       refs.head = null;
       refs.actions = null;

@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState, type RefObject } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, ContactShadows, useProgress, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
@@ -29,7 +29,9 @@ function switchAction(stage: Stage) {
   refs.current = want;
 }
 
-function Rig({ base, projects, studies }: Props) {
+const _v = new THREE.Vector3();
+
+function Rig({ base, projects, studies, hotspot }: Props & { hotspot: RefObject<HTMLDivElement | null> }) {
   const rig = useRef<THREE.Group>(null!);
   const [loaded, setLoaded] = useState(false);
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
@@ -51,8 +53,20 @@ function Rig({ base, projects, studies }: Props) {
     return setupScroll(switchAction);
   }, [loaded]);
 
-  useFrame(() => {
+  useFrame(({ size }) => {
     camera.lookAt(refs.target);
+    // keep the DOM face hotspot glued to the projected head position (landing stage only)
+    const el = hotspot.current;
+    if (!el) return;
+    const on = refs.stage === 'landing' && !!refs.head;
+    if (on) {
+      refs.head!.getWorldPosition(_v);
+      _v.y += 0.04;
+      _v.project(camera);
+      el.style.left = `${((_v.x + 1) / 2) * size.width}px`;
+      el.style.top = `${((1 - _v.y) / 2) * size.height}px`;
+    }
+    if (el.dataset.on !== String(on)) el.dataset.on = String(on);
   });
 
   return (
@@ -92,6 +106,7 @@ function Loader() {
 /** Fixed full-viewport 3D story layer. Desktop + WebGL2 + no reduced-motion only; otherwise renders nothing. */
 export default function Scene({ base, projects, studies }: Props) {
   const [ok, setOk] = useState(false);
+  const hotspot = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1024px)').matches;
@@ -143,10 +158,20 @@ export default function Scene({ base, projects, studies }: Props) {
           <directionalLight position={[-3, 2, -2]} intensity={1.3} color="#5eead4" />
           <Suspense fallback={null}>
             <Environment files={`${base}/models/env.hdr`} environmentIntensity={0.55} />
-            <Rig base={base} projects={projects} studies={studies} />
+            <Rig base={base} projects={projects} studies={studies} hotspot={hotspot} />
             <ContactShadows position={[0, 0.001, 0.3]} opacity={0.55} scale={5} blur={2.4} far={1.6} resolution={512} />
           </Suspense>
         </Canvas>
+        <div
+          ref={hotspot}
+          className="face-hotspot"
+          data-on="false"
+          role="button"
+          tabIndex={-1}
+          aria-label="Say hi"
+          onPointerEnter={() => refs.wave?.()}
+          onClick={() => refs.wave?.()}
+        />
       </div>
     </>
   );
