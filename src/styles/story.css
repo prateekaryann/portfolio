@@ -7,7 +7,11 @@
 .scene-root { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
 .scene-root canvas { display: block; }
 .term3d-wrap { pointer-events: none; }
-.term3d { width: 1040px; height: 640px; pointer-events: auto; transition: opacity .3s; }
+.term3d-wrap > div > div { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+/* story sections sit above the canvas; let empty space pass clicks through to the 3D terminal */
+#story .stage, #story .stage-inner { pointer-events: none; }
+#story .landing-copy, #story .about-copy, #story .whatido-copy, #story .screen-copy, #story .landing-poster, #story .term-mobile { pointer-events: auto; }
+.term3d { width: 1040px; height: 640px; pointer-events: auto; transition: opacity .3s; backface-visibility: hidden; -webkit-backface-visibility: hidden; cursor: text; }
 .term3d .term { width: 100%; height: 100%; font-size: 1.05rem; border-radius: 6px; box-shadow: none; border-color: rgba(255,255,255,.06); background: #07070b; }
 .term3d .term-body { padding: 1.3rem 1.5rem; }
 

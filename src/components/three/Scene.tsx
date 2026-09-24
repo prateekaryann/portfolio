@@ -11,6 +11,12 @@ import type { TermProject, TermStudy } from '../Terminal';
 type Props = { base: string; projects: TermProject[]; studies: TermStudy[] };
 
 function switchAction(stage: Stage) {
+  // focus the on-screen shell while zoomed in, release it when we leave (scroll-event driven, not rAF)
+  const input = document.querySelector<HTMLInputElement>('.term3d .term-input');
+  if (input) {
+    if (stage === 'screen') input.focus({ preventScroll: true });
+    else if (document.activeElement === input) input.blur();
+  }
   const a = refs.actions;
   if (!a) return;
   const want = stage === 'desk' || stage === 'screen' ? 'typing' : 'sitting_idle';

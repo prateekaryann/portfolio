@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -8,6 +8,33 @@ import Terminal, { type TermProject, type TermStudy } from '../Terminal';
 type Props = { base: string; projects: TermProject[]; studies: TermStudy[] };
 
 const DARK = '#0e0e16';
+
+/** 5 rows × 14 keycaps as one instanced mesh (70 draw-call-free keys). */
+function Keycaps() {
+  const ref = useRef<THREE.InstancedMesh>(null!);
+  const layout = useMemo(() => {
+    const m = new THREE.Matrix4();
+    const out: THREE.Matrix4[] = [];
+    for (let r = 0; r < 5; r++) {
+      for (let c = 0; c < 14; c++) {
+        if (r === 4 && c > 3 && c < 10) continue; // spacebar gap
+        m.makeTranslation(-0.195 + c * 0.03, 0.009, -0.058 + r * 0.028);
+        out.push(m.clone());
+      }
+    }
+    return out;
+  }, []);
+  useEffect(() => {
+    layout.forEach((m, i) => ref.current.setMatrixAt(i, m));
+    ref.current.instanceMatrix.needsUpdate = true;
+  }, [layout]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, layout.length]} castShadow>
+      <boxGeometry args={[0.024, 0.008, 0.022]} />
+      <meshStandardMaterial color="#2a2a38" roughness={0.6} transparent />
+    </instancedMesh>
+  );
+}
 const DARKER = '#0a0a10';
 
 /**
@@ -36,6 +63,10 @@ export function Desk({ base, projects, studies }: Props) {
     const on = refs.stage === 'desk' || refs.stage === 'screen';
     if (on !== active) setActive(on);
   });
+  const enter = () => {
+    if (refs.stage === 'screen') return;
+    document.getElementById('screen')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <group>
@@ -76,15 +107,29 @@ export function Desk({ base, projects, studies }: Props) {
             <meshStandardMaterial color="#1c1c28" roughness={0.6} metalness={0.4} transparent />
           </mesh>
         ))}
-        {/* keyboard + mouse */}
-        <mesh position={[0, 0.748, 0.55]} castShadow>
-          <boxGeometry args={[0.44, 0.014, 0.15]} />
-          <meshStandardMaterial color="#1a1a26" roughness={0.7} transparent />
-        </mesh>
-        <mesh position={[0.34, 0.752, 0.55]} castShadow>
-          <boxGeometry args={[0.06, 0.02, 0.1]} />
-          <meshStandardMaterial color="#1a1a26" roughness={0.7} transparent />
-        </mesh>
+        {/* keyboard: base slab + instanced keycaps + spacebar */}
+        <group position={[0, 0.7425, 0.55]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.44, 0.012, 0.15]} />
+            <meshStandardMaterial color="#15151f" roughness={0.75} transparent />
+          </mesh>
+          <Keycaps />
+          <mesh position={[0, 0.011, 0.052]} castShadow>
+            <boxGeometry args={[0.16, 0.008, 0.02]} />
+            <meshStandardMaterial color="#2a2a38" roughness={0.6} transparent />
+          </mesh>
+        </group>
+        {/* mouse: ellipsoid body + wheel */}
+        <group position={[0.34, 0.748, 0.55]}>
+          <mesh castShadow scale={[0.031, 0.018, 0.052]}>
+            <sphereGeometry args={[1, 24, 16]} />
+            <meshStandardMaterial color="#1c1c28" roughness={0.45} metalness={0.15} transparent />
+          </mesh>
+          <mesh position={[0, 0.016, -0.018]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.005, 0.005, 0.006, 12]} />
+            <meshStandardMaterial color="#3a3a4a" roughness={0.5} transparent />
+          </mesh>
+        </group>
         {/* monitor stand */}
         <mesh position={[0, 0.748, 0.98]}>
           <boxGeometry args={[0.3, 0.014, 0.18]} />
@@ -119,7 +164,7 @@ export function Desk({ base, projects, studies }: Props) {
             zIndexRange={[3, 1]}
             wrapperClass="term3d-wrap"
           >
-            <div ref={html} className="term3d" style={{ opacity: 0 }}>
+            <div ref={html} className="term3d" style={{ opacity: 0 }} onClick={enter}>
               <Terminal base={base} projects={projects} studies={studies} active={active} variant="screen" />
             </div>
           </Html>
