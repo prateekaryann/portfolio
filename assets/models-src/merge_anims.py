@@ -7,6 +7,7 @@ CLIPS = {  # file -> clip name
     'Talking.fbx': 'talking',
     'Stand To Sit.fbx': 'stand_to_sit',
     'Sit To Stand.fbx': 'sit_to_stand',
+    'Waving.fbx': 'wave',
 }
 
 def channelbags(act):

@@ -16,7 +16,8 @@ export function Avatar({ url, onLoaded }: Props) {
   const group = useRef<THREE.Group>(null!);
   const gltf = useGLTF(url, false, true) as any;
   const { scene, animations, nodes } = gltf;
-  const { actions } = useAnimations(animations, group);
+  const { actions, mixer } = useAnimations(animations, group);
+  const smile = useRef({ on: false, v: 0, meshes: [] as THREE.Mesh[] });
   const look = useRef({ x: 0, y: 0 });
   const blink = useRef({ t: 2 + Math.random() * 3, v: 0, meshes: [] as THREE.Mesh[] });
 
@@ -28,6 +29,7 @@ export function Avatar({ url, onLoaded }: Props) {
         o.receiveShadow = true;
         o.frustumCulled = false;
         if (o.morphTargetDictionary && 'eyeBlinkLeft' in o.morphTargetDictionary) meshes.push(o);
+        if (o.morphTargetDictionary && 'mouthSmileLeft' in o.morphTargetDictionary) smile.current.meshes.push(o);
       }
     });
     blink.current.meshes = meshes;
@@ -39,7 +41,32 @@ export function Avatar({ url, onLoaded }: Props) {
     refs.current = 'sitting_idle';
     refs.loaded = true;
     onLoaded?.();
+
+    // "hi" on arrival: the Mixamo wave, right-arm tracks only, layered over the seated idle.
+    // Weight >> 1 so the arm follows the wave rather than a 50/50 blend with the idle.
+    let waveTimer = 0;
+    let waveAction: THREE.AnimationAction | null = null;
+    const onFinished = (e: any) => {
+      if (e.action !== waveAction) return;
+      waveAction?.fadeOut(0.45);
+      smile.current.on = false;
+    };
+    const waveClip = (animations as THREE.AnimationClip[]).find((c) => c.name === 'wave');
+    if (waveClip) {
+      const armTracks = waveClip.tracks.filter((t) => /^Right(Shoulder|Arm|ForeArm|Hand)/.test(t.name));
+      const armClip = new THREE.AnimationClip('wave_arm', waveClip.duration, armTracks);
+      waveAction = mixer.clipAction(armClip, group.current);
+      waveAction.setLoop(THREE.LoopOnce, 1);
+      waveAction.clampWhenFinished = false;
+      mixer.addEventListener('finished', onFinished);
+      waveTimer = window.setTimeout(() => {
+        waveAction!.reset().setEffectiveTimeScale(1.1).setEffectiveWeight(8).fadeIn(0.35).play();
+        smile.current.on = true;
+      }, 700);
+    }
     return () => {
+      window.clearTimeout(waveTimer);
+      mixer.removeEventListener('finished', onFinished);
       refs.loaded = false;
       refs.head = null;
       refs.actions = null;
@@ -65,6 +92,15 @@ export function Avatar({ url, onLoaded }: Props) {
     // the mixer wrote the clip pose this frame; add our offset on top
     head.rotation.x += look.current.x;
     head.rotation.y += look.current.y;
+
+    const sm = smile.current;
+    sm.v += ((sm.on ? 0.65 : 0) - sm.v) * (1 - Math.exp(-dt * 4));
+    for (const m of sm.meshes) {
+      const d = m.morphTargetDictionary!;
+      const inf = m.morphTargetInfluences!;
+      inf[d.mouthSmileLeft] = sm.v;
+      inf[d.mouthSmileRight] = sm.v;
+    }
 
     const b = blink.current;
     b.t -= dt;
