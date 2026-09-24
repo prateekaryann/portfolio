@@ -19,7 +19,7 @@ export const refs = {
 
 /** Camera keyframes per scroll stage. Units: metres, avatar sits at origin facing +Z, monitor at z≈0.95. */
 export const CAM = {
-  landing: { pos: [0, 1.25, 3.7], tgt: [0, 0.9, 0] },
+  landing: { pos: [0, 1.32, 1.75], tgt: [0, 1.14, 0] },
   about: { pos: [-0.6, 1.12, 2.4], tgt: [0.7, 1.0, 0] },
   desk: { pos: [2.5, 1.95, 2.7], tgt: [0.75, 0.85, 0.55] },
   screen: { pos: [0.34, 1.3, 0.22], tgt: [0, 1.06, 0.93] },

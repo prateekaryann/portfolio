@@ -14,7 +14,7 @@
 /* loader */
 .loader { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; background: var(--bg); transition: opacity .6s var(--ease); }
 .loader.done { opacity: 0; pointer-events: none; }
-.loader-pill { font-family: var(--font-mono); font-size: .8rem; letter-spacing: .18em; text-transform: uppercase; color: var(--fg-muted); padding: .8rem 1.6rem; border-radius: var(--r-pill); background: var(--glass); border: 1px solid var(--glass-brd); box-shadow: var(--glow-cyan); }
+.loader-pill { font-family: var(--font-display); font-size: .8rem; letter-spacing: .18em; text-transform: uppercase; color: var(--fg-muted); padding: .8rem 1.6rem; border-radius: var(--r-pill); background: var(--glass); border: 1px solid var(--glass-brd); box-shadow: var(--glow-cyan); }
 .loader-pill b { color: var(--accent-2); font-weight: 500; margin-left: .4rem; }
 
 /* story stages */
@@ -23,30 +23,38 @@
 .stage-inner { position: absolute; inset: 0; max-width: var(--w-wide); margin: 0 auto; padding-inline: clamp(1.2rem, 4vw, 2.5rem); }
 .exit-stage { min-height: 100vh; }
 
-/* landing */
+/* landing — reference: light teal "Hello! I'm", big uppercase name, lower third */
 .landing-copy { position: absolute; inset: 0; }
 .landing-intro { position: absolute; left: 0; top: 50%; translate: 0 -50%; width: 32%; }
-.landing-intro h2 { font-family: var(--font-mono); font-size: .95rem; font-weight: 400; letter-spacing: .2em; text-transform: uppercase; color: var(--teal); margin-bottom: .6rem; }
-.landing-intro h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(2.6rem, 4.6vw, 4.4rem); line-height: .95; letter-spacing: .02em; text-transform: uppercase; margin: 0; }
-.landing-intro h1 span { font-weight: 500; color: var(--fg-muted); }
-.landing-info { position: absolute; left: 66%; top: 50%; translate: 0 -50%; width: 34%; }
-.landing-info h3 { font-family: var(--font-mono); font-size: .95rem; font-weight: 400; letter-spacing: .2em; text-transform: uppercase; color: var(--teal); margin-bottom: .6rem; }
-.landing-info h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(2rem, 3.6vw, 3.4rem); line-height: 1.05; text-transform: uppercase; letter-spacing: .02em; margin: 0; }
-.landing-info .flip { position: relative; display: block; height: 1.05em; overflow: hidden; }
+.landing-intro h2 { font-family: var(--font-display); font-size: clamp(22px, 1.9vw, 35px); font-weight: 300; letter-spacing: 2px; color: var(--accent); margin-bottom: 0; text-transform: none; }
+.landing-intro h1 { font-family: var(--font-display); font-weight: 500; font-size: clamp(40px, 3.6vw, 60px); line-height: .95; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
+.landing-intro h1 span { font-weight: 500; color: var(--fg); }
+.landing-info { position: absolute; left: 66%; top: 51%; translate: 0 -50%; width: 34%; }
+.landing-info h3 { font-family: var(--font-display); font-size: clamp(22px, 1.9vw, 35px); font-weight: 300; letter-spacing: 2px; color: var(--accent); margin-bottom: 0; text-transform: none; }
+.landing-info h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(35px, 3.3vw, 65px); line-height: 1; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+.landing-info .flip { position: relative; display: block; height: 1.02em; overflow: hidden; }
+.landing-info .flip.a { height: 1.22em; padding-top: .08em; margin-left: -.06em; font-size: 1.15em; color: var(--teal-2); }
+.landing-info .flip.a::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, var(--bg) 22%, rgba(0,0,0,0) 105%); pointer-events: none; }
+.landing-info .flip.b { margin-left: .35em; }
 .landing-info .flip span { position: absolute; left: 0; top: 0; white-space: nowrap; animation: flip 8s var(--ease) infinite; }
 .landing-info .flip span:nth-child(2) { animation-delay: -4s; }
 .landing-info .flip.b span { animation-delay: .12s; }
 .landing-info .flip.b span:nth-child(2) { animation-delay: -3.88s; }
-.landing-info .flip .grad-text { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.landing-info .flip .grad-text { background: none; color: var(--teal-2); }
 @keyframes flip {
   0%, 42% { transform: translateY(0); opacity: 1; }
   48%, 92% { transform: translateY(-110%); opacity: 0; }
   94% { transform: translateY(110%); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 }
-.landing-cta { position: absolute; left: 0; bottom: 14%; display: flex; gap: .8rem; }
+.landing-cta { position: absolute; left: 0; bottom: 9%; display: flex; gap: .8rem; }
 .landing-poster { display: none; }
 .landing .scroll-cue { z-index: 3; }
+@media (min-width: 1024px) {
+  .landing-intro { top: auto; bottom: 22%; translate: none; }
+  .landing-info { top: auto; bottom: 21%; translate: none; }
+  .landing-cta { display: none; }
+}
 
 /* about */
 .about-copy { position: absolute; right: 0; top: 50%; translate: 0 -50%; width: 46%; opacity: 0; }
@@ -99,7 +107,7 @@
 .career-box p { width: 44%; margin: 0; font-size: 1rem; line-height: 1.6; }
 
 /* terminal (shared by the 3D monitor and the mobile card) */
-.term { font-family: var(--font-mono); font-size: .84rem; line-height: 1.6; background: #0a090d; border: 1px solid var(--glass-brd); border-radius: var(--r); box-shadow: var(--shadow), var(--glow-violet); display: flex; flex-direction: column; height: clamp(338px, 46vh, 440px); overflow: hidden; }
+.term { user-select: text; -webkit-user-select: text; font-family: var(--font-mono); font-size: .84rem; line-height: 1.6; background: #0a090d; border: 1px solid var(--glass-brd); border-radius: var(--r); box-shadow: var(--shadow), var(--glow-violet); display: flex; flex-direction: column; height: clamp(338px, 46vh, 440px); overflow: hidden; }
 .term-bar { display: flex; align-items: center; gap: .5rem; padding: .6rem .85rem; border-bottom: 1px solid var(--glass-brd); }
 .term-bar .tdot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
 .term-bar .tdot.r { background: #ff5f57; }
@@ -129,7 +137,7 @@ html:not(.has-3d) .stage { min-height: 0; padding-block: clamp(3rem, 8vw, 5rem);
 html:not(.has-3d) .stage-inner { position: static; }
 html:not(.has-3d) .landing-copy, html:not(.has-3d) .landing-intro, html:not(.has-3d) .landing-info, html:not(.has-3d) .landing-cta,
 html:not(.has-3d) .about-copy, html:not(.has-3d) .whatido-copy, html:not(.has-3d) .whatido-title, html:not(.has-3d) .what-box { position: static; translate: none; width: auto; opacity: 1; }
-html:not(.has-3d) .landing { padding-top: 2rem; }
+html:not(.has-3d) .landing { padding-top: 5.5rem; }
 html:not(.has-3d) .landing-intro { margin-bottom: 1.6rem; }
 html:not(.has-3d) .landing-info { margin-bottom: 2rem; }
 html:not(.has-3d) .landing-cta { margin-bottom: 2.4rem; flex-wrap: wrap; }
