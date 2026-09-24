@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/story.css';
 import { ClientRouter } from 'astro:transitions';
 
 interface Props {
@@ -56,10 +57,11 @@ const ogImageUrl = ogImage ?? new URL('/portfolio/og-default.png', Astro.site).t
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <nav class="nav" id="nav">
-          <a href={`${base}/#work`}>Work</a>
-          <a href={`${base}/#case-studies`}>Case studies</a>
           <a href={`${base}/#about`}>About</a>
+          <a href={`${base}/#career`}>Career</a>
+          <a href={`${base}/#case-studies`}>Case studies</a>
           <a href={`${base}/#projects`}>Projects</a>
+          <a href={`${base}/#contact`}>Contact</a>
           <a href={`${base}/Prateek_Aryan_Resume.pdf`} class="btn btn-primary" target="_blank" rel="noopener">Résumé</a>
         </nav>
       </div>

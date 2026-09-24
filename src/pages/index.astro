@@ -2,6 +2,8 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { panel } from '../lib/covers';
+import Scene from '../components/three/Scene';
+import Terminal from '../components/Terminal';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
@@ -21,7 +23,22 @@ const skills = [
   { icon: 'data', title: 'Data & Systems', items: ['Distributed systems', 'MongoDB', 'Redis', 'Kafka', 'Step Functions', 'Observability'] },
 ];
 
+const whatIDo = [
+  { title: 'Distributed backends', sub: 'Systems that stay up', body: 'APIs, queues, state machines and switchover automation for services that cannot fall over. Idempotency, fencing, and failure-mode design as first-class work.', tags: ['Python', 'FastAPI', 'PostgreSQL', 'gRPC', 'Redis', 'Kafka'] },
+  { title: 'LLM & GenAI platforms', sub: 'Production AI, not demos', body: 'Fault-tolerant LLM orchestration, idempotent RAG pipelines, and cost controls (prompt caching, model tiering) for regulated clinical content generation.', tags: ['RAG', 'Bedrock / Claude', 'Step Functions', 'OpenSearch', 'Evals'] },
+  { title: 'Cloud & DevOps', sub: 'Automation over toil', body: 'AWS-native infrastructure, Kubernetes deployments, Terraform, and the CI/CD pipelines that turn 3-hour manual jobs into 10-minute automated ones.', tags: ['AWS', 'EKS / K8s', 'Terraform', 'Docker', 'Helm', 'CI/CD'] },
+];
+
+const career = [
+  { role: 'Senior Software Engineer II', org: 'UsefulBI · AI Engineer, Gilead Sciences platform', when: 'NOW', body: 'Building the production systems behind automated clinical-document generation (CSR, DSUR, PLPS): fault-tolerant LLM orchestration with durable execution, an idempotent RAG pipeline, and prompt-caching & model-tiering cost controls. Grew out of a clinical-document POC I built and solely owned — the demo that won the engagement.' },
+  { role: 'Software Engineer', org: 'Cisco Systems · Bengaluru', when: '2021–25', body: 'Kept 200+ enterprise applications reliable: gRPC-based distributed database switchover automation, MySQL cluster upgrade tooling (1h → 10min), and a SOX compliance reporting pipeline cut from 3+ hours to under 10 minutes.' },
+  { role: 'B.E. Computer Science', org: 'BMS College of Engineering · 9.2 GPA', when: '2017–21', body: 'Bengaluru. Certified since: AWS Cloud Practitioner, HashiCorp Terraform Associate, MongoDB DBA, PCAP (Python).' },
+];
+
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+const termProjects = projects.map((p) => ({ name: p.id, desc: p.data.tagline, path: `${base}/projects/${p.id}/` }));
+const termStudies = studies.map((e, i) => ({ n: i + 1, title: e.data.title, path: `${base}/case-studies/${e.id}/` }));
 
 const ICONS = {
   server: '<rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><line x1="7" y1="7.5" x2="7" y2="7.5"/><line x1="7" y1="16.5" x2="7" y2="16.5"/>',
@@ -31,37 +48,119 @@ const ICONS = {
 };
 const ico = (n) => `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
 
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Prateek Aryan',
+  jobTitle: 'Senior Software Engineer',
+  url: 'https://prateekaryann.github.io/portfolio/',
+  email: 'mailto:prateekaryyan@gmail.com',
+  sameAs: ['https://github.com/prateekaryann', 'https://linkedin.com/in/prateek-aryan', 'https://medium.com/@prateekaryyan', 'https://x.com/prateekaryyan'],
+  address: { '@type': 'PostalAddress', addressLocality: 'Bengaluru', addressCountry: 'IN' },
+  knowsAbout: ['Distributed systems', 'LLM systems', 'RAG pipelines', 'Python', 'FastAPI', 'AWS'],
+};
+
 const pageTitle = 'Prateek Aryan — Senior Software Engineer · LLM/GenAI & Distributed Systems';
 const pageDescription = 'Senior Software Engineer building production LLM/GenAI systems and distributed backends on Python, FastAPI, and AWS. AI Engineer on the Gilead Sciences clinical content-generation platform.';
 ---
 
 <Base title={pageTitle} description={pageDescription}>
-  <!-- HERO -->
-  <section class="hero wrap">
-    <canvas id="hero-canvas" aria-hidden="true"></canvas>
-    <div class="hero-inner">
-      <span class="badge" data-reveal><span class="dot"></span> Open to senior backend / AI engineering contracts</span>
-      <h1 data-reveal data-delay="1">Production <span class="grad-text">LLM&nbsp;systems</span> &amp; distributed backends that don't fall over.</h1>
-      <p class="lead" data-reveal data-delay="2">
-        I'm <strong>Prateek Aryan</strong> — a Senior Software Engineer building fault-tolerant
-        GenAI and platform systems on <strong>Python, FastAPI, and AWS</strong>. Currently an
-        <strong>AI Engineer on the Gilead Sciences</strong> clinical content-generation platform.
-      </p>
-      <div class="hero-cta" data-reveal data-delay="3">
-        <a href="#case-studies" class="btn btn-primary">View case studies
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-        </a>
-        <a href={`${base}/Prateek_Aryan_Resume.pdf`} class="btn btn-ghost" target="_blank" rel="noopener">Download résumé</a>
+  <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+
+  <Scene client:only="react" base={base} projects={termProjects} studies={termStudies} />
+
+  <!-- ===== 3D STORY: landing → about → what I do → screen → exit ===== -->
+  <div id="story">
+    <section class="stage landing" id="landing">
+      <div class="stage-inner">
+        <div class="landing-copy">
+          <div class="landing-intro">
+            <h2>Hello! I'm</h2>
+            <h1>Prateek<br /><span>Aryan</span></h1>
+          </div>
+          <div class="landing-info">
+            <h3>Senior Software Engineer</h3>
+            <h2>
+              <span class="flip a"><span>Distributed</span><span class="grad-text">LLM</span></span>
+              <span class="flip b"><span>Backends</span><span>Platforms</span></span>
+            </h2>
+          </div>
+          <div class="landing-cta">
+            <a href="#case-studies" class="btn btn-primary">View case studies</a>
+            <a href={`${base}/Prateek_Aryan_Resume.pdf`} class="btn btn-ghost" target="_blank" rel="noopener">Résumé</a>
+          </div>
+        </div>
+        <img class="landing-poster" src={`${base}/models/poster.png`} alt="3D avatar of Prateek Aryan" width="420" height="640" loading="eager" />
+        <div class="term-mobile"><Terminal client:only="react" base={base} projects={termProjects} studies={termStudies} /></div>
       </div>
-      <div class="chips" data-reveal data-delay="3">
-        <span class="chip">RAG pipelines</span><span class="chip">LLM orchestration</span><span class="chip">FastAPI</span><span class="chip">AWS / EKS</span><span class="chip">Distributed systems</span>
+      <div class="scroll-cue" aria-hidden="true"><span>scroll</span><span class="line"></span></div>
+    </section>
+
+    <section class="stage about" id="about">
+      <div class="stage-inner">
+        <div class="about-copy">
+          <span class="eyebrow">About me</span>
+          <p>
+            I build backend and LLM systems that stay up when things get hard — currently as an
+            AI Engineer on the Gilead Sciences clinical content-generation platform via UsefulBI.
+          </p>
+          <p>
+            Before that, five years at Cisco Systems keeping 200+ enterprise apps reliable: database
+            automation, gRPC switchover systems, and a SOX pipeline cut from 3+ hours to under 10 minutes.
+            Python, FastAPI, AWS, and the unglamorous reliability work in between.
+          </p>
+        </div>
       </div>
+    </section>
+
+    <section class="stage whatido" id="whatido">
+      <div class="stage-inner">
+        <div class="whatido-copy">
+          <h2 class="whatido-title">W<em>hat</em><br />I <span>do</span></h2>
+          <div class="what-box">
+            {whatIDo.map((w, i) => (
+              <div class={`what-card${i === 0 ? ' open' : ''}`}>
+                <span class="corner"></span>
+                <span class="arrow" aria-hidden="true"></span>
+                <h3>{w.title}</h3>
+                <h4>{w.sub}</h4>
+                <p>{w.body}</p>
+                <div class="chips">{w.tags.map((t) => <span class="chip">{t}</span>)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage screen-stage" id="screen" aria-hidden="true">
+      <div class="stage-inner">
+        <div class="screen-copy">↳ that terminal is real — click it and type <b>help</b></div>
+      </div>
+    </section>
+
+    <section class="stage exit-stage" aria-hidden="true"></section>
+  </div>
+
+  <!-- ===== CAREER ===== -->
+  <section class="block wrap career" id="career">
+    <h2 class="career-title">My career <span>&amp;</span><br />experience</h2>
+    <div class="career-info" data-reveal>
+      <div class="career-timeline"><div class="career-dot"></div></div>
+      {career.map((c) => (
+        <div class="career-box">
+          <div class="career-in">
+            <div><h4>{c.role}</h4><h5>{c.org}</h5></div>
+            <h3>{c.when}</h3>
+          </div>
+          <p>{c.body}</p>
+        </div>
+      ))}
     </div>
-    <div class="scroll-cue" aria-hidden="true"><span>scroll</span><span class="line"></span></div>
   </section>
 
-  <!-- WORK / NUMBERS -->
-  <section class="block wrap" id="work">
+  <!-- ===== NUMBERS ===== -->
+  <section class="block wrap" id="numbers">
     <div class="xp-strip" data-reveal>
       <span class="org">Gilead Sciences</span><span class="org">Cisco Systems</span><span class="org">UsefulBI</span><span class="org">BMS College</span>
     </div>
@@ -73,44 +172,7 @@ const pageDescription = 'Senior Software Engineer building production LLM/GenAI 
     </div>
   </section>
 
-  <!-- ABOUT -->
-  <section class="block wrap" id="about">
-    <div class="section-head narrow" data-reveal>
-      <span class="eyebrow">About</span>
-      <h2>I build backend &amp; LLM systems that stay up when things get hard.</h2>
-    </div>
-    <div class="about-grid narrow">
-      <div class="glass about-card" data-reveal>
-        <p>
-          Right now I'm an <strong>AI Engineer on the Gilead Sciences</strong> clinical
-          content-generation platform (via <a href="https://usefulbi.com" target="_blank" rel="noopener">UsefulBI</a>),
-          building the production systems behind automated CSR, DSUR, and PLPS generation:
-          fault-tolerant LLM orchestration with durable execution, an idempotent RAG pipeline,
-          and prompt-caching &amp; model-tiering cost controls.
-        </p>
-        <p>
-          That engagement grew out of a platform I <strong>built and solely owned</strong> at
-          UsefulBI — an AI clinical-document POC with a 5-stage RAG pipeline and 21 CFR Part 11
-          audit trails. It became the demo that won the Gilead engagement.
-        </p>
-        <p>
-          Before that, five years at <strong>Cisco Systems</strong> kept 200+ enterprise apps
-          reliable — database automation, gRPC switchover systems, and a SOX pipeline cut from
-          3+ hours to under 10 minutes.
-        </p>
-      </div>
-      <div data-reveal data-delay="1">
-        <div class="avatar"><img src={`${base}/prateek.webp`} alt="Prateek Aryan" width="900" height="1200" loading="lazy" /></div>
-        <ul class="facts">
-          <li><span set:html={ico('cloud')} /> Bengaluru, India · US/EU overlap</li>
-          <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m12 2 2.5 6.5L21 9l-5 4 1.5 7L12 16l-5.5 4L8 13 3 9l6.5-.5z"/></svg> 9.2 GPA · B.E. CS, BMS College</li>
-          <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg> AWS · Terraform · MongoDB · PCAP certified</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- CASE STUDIES -->
+  <!-- ===== CASE STUDIES ===== -->
   <section class="block wrap" id="case-studies">
     <div class="section-head" data-reveal>
       <span class="eyebrow">Case studies</span>
@@ -140,7 +202,7 @@ const pageDescription = 'Senior Software Engineer building production LLM/GenAI 
     </div>
   </section>
 
-  <!-- SKILLS -->
+  <!-- ===== SKILLS ===== -->
   <section class="block wrap" id="skills">
     <div class="section-head" data-reveal>
       <span class="eyebrow">Toolkit</span>
@@ -158,7 +220,7 @@ const pageDescription = 'Senior Software Engineer building production LLM/GenAI 
     </div>
   </section>
 
-  <!-- PROJECTS -->
+  <!-- ===== PROJECTS ===== -->
   <section class="block wrap" id="projects">
     <div class="section-head" data-reveal>
       <span class="eyebrow">Open source</span>
@@ -183,7 +245,7 @@ const pageDescription = 'Senior Software Engineer building production LLM/GenAI 
     </div>
   </section>
 
-  <!-- CONTACT -->
+  <!-- ===== CONTACT ===== -->
   <section class="block wrap" id="contact">
     <div class="glass cta" data-reveal>
       <span class="eyebrow" style="justify-content:center">Contact</span>
@@ -201,65 +263,15 @@ const pageDescription = 'Senior Software Engineer building production LLM/GenAI 
   </section>
 
   <script>
-    function initHero() {
-      const canvas = document.getElementById('hero-canvas');
-      if (!canvas || canvas.dataset.inited) return;
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      canvas.dataset.inited = '1';
-      import(/* @vite-ignore */ 'https://esm.sh/three@0.160.0').then((THREE) => {
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
-        camera.position.z = 5;
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        const group = new THREE.Group();
-        const geo = new THREE.IcosahedronGeometry(2.1, 1);
-        const wire = new THREE.LineSegments(
-          new THREE.WireframeGeometry(geo),
-          new THREE.LineBasicMaterial({ color: 0x8b5cf6, transparent: true, opacity: 0.55 })
-        );
-        const pts = new THREE.Points(
-          geo,
-          new THREE.PointsMaterial({ color: 0x22d3ee, size: 0.06, transparent: true, opacity: 0.9 })
-        );
-        group.add(wire); group.add(pts);
-
-        const starGeo = new THREE.BufferGeometry();
-        const N = 320, arr = new Float32Array(N * 3);
-        for (let i = 0; i < N * 3; i++) arr[i] = (Math.random() - 0.5) * 18;
-        starGeo.setAttribute('position', new THREE.BufferAttribute(arr, 3));
-        const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xa78bfa, size: 0.03, transparent: true, opacity: 0.5 }));
-        scene.add(stars); scene.add(group);
-
-        let mx = 0, my = 0;
-        window.addEventListener('pointermove', (e) => {
-          mx = (e.clientX / window.innerWidth - 0.5);
-          my = (e.clientY / window.innerHeight - 0.5);
+    // "What I do" cards: click-to-expand on touch devices (hover handles desktop)
+    function initCards() {
+      document.querySelectorAll('.what-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.what-card').forEach((c) => c !== card && c.classList.remove('open'));
+          card.classList.toggle('open');
         });
-
-        function resize() {
-          const r = canvas.getBoundingClientRect();
-          renderer.setSize(r.width, r.height, false);
-          camera.aspect = r.width / r.height; camera.updateProjectionMatrix();
-        }
-        resize();
-        window.addEventListener('resize', resize);
-        canvas.classList.add('ready');
-
-        let raf;
-        (function loop() {
-          raf = requestAnimationFrame(loop);
-          group.rotation.y += 0.0024; group.rotation.x += 0.0011;
-          group.position.x += (mx * 1.4 - group.position.x) * 0.05;
-          group.position.y += (-my * 1 - group.position.y) * 0.05;
-          stars.rotation.y += 0.0004;
-          renderer.render(scene, camera);
-        })();
-
-        document.addEventListener('astro:before-swap', () => { cancelAnimationFrame(raf); }, { once: true });
-      }).catch(() => {});
+      });
     }
-    document.addEventListener('astro:page-load', initHero);
+    document.addEventListener('astro:page-load', initCards);
   </script>
 </Base>

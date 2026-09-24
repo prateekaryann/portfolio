@@ -6,3 +6,7 @@ dist/
 .DS_Store
 *.log
 .claude/
+
+# derivable / scratch model sources
+assets/models-src/prateek-raw.glb
+assets/models-src/avaturn-screenshot.jpg
